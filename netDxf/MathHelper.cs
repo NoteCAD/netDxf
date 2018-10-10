@@ -194,7 +194,7 @@ namespace netDxf
         public static IList<Vector2> Transform(IEnumerable<Vector2> points, double rotation, CoordinateSystem from, CoordinateSystem to)
         {
             if (points == null)
-                throw new ArgumentNullException(nameof(points));
+                throw new ArgumentNullException("points");
 
             // if the rotation is 0 no transformation is needed the transformation matrix is the identity
             if (IsZero(rotation))
@@ -258,7 +258,7 @@ namespace netDxf
         public static IList<Vector3> Transform(IEnumerable<Vector3> points, Vector3 zAxis, CoordinateSystem from, CoordinateSystem to)
         {
             if (points == null)
-                throw new ArgumentNullException(nameof(points));
+                throw new ArgumentNullException("points");
 
             if (zAxis.Equals(Vector3.UnitZ))
                 return new List<Vector3>(points);

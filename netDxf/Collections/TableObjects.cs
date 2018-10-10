@@ -168,7 +168,7 @@ namespace netDxf.Collections
         public List<DxfObject> GetReferences(T item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             return this.GetReferences(item.Name);
         }
 
@@ -215,7 +215,7 @@ namespace netDxf.Collections
         public T Add(T item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             return this.Add(item, true);
         }
 

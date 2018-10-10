@@ -66,7 +66,7 @@ namespace netDxf.Collections
             if (this.list.Count >= this.MaxCapacity)
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (group == null)
-                throw new ArgumentNullException(nameof(group));
+                throw new ArgumentNullException("group");
 
             // if no name has been given to the group a generic name will be created
             if (group.IsUnnamed && string.IsNullOrEmpty(group.Name))

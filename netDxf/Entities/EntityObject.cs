@@ -127,7 +127,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets the list of dxf objects that has been attached to this entity.
         /// </summary>
-        public IReadOnlyList<DxfObject> Reactors
+        public IList<DxfObject> Reactors
         {
             get { return this.reactors; }
         }
@@ -149,7 +149,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.color = value;
             }
         }
@@ -163,7 +163,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.layer = this.OnLayerChangedEvent(this.layer, value);
             }
         }
@@ -177,7 +177,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -200,7 +200,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.transparency = value;
             }
         }
@@ -214,7 +214,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The line type scale must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The line type scale must be greater than zero.");
                 this.linetypeScale = value;
             }
         }
@@ -238,7 +238,7 @@ namespace netDxf.Entities
             {
                 this.normal = Vector3.Normalize(value);
                 if (Vector3.IsNaN(this.normal))
-                    throw new ArgumentException("The normal can not be the zero vector.", nameof(value));
+                    throw new ArgumentException("The normal can not be the zero vector.", "value");
             }
         }
 

@@ -100,9 +100,9 @@ namespace netDxf.Entities
             : base(DimensionType.Angular)
         {
             if (firstLine == null)
-                throw new ArgumentNullException(nameof(firstLine));
+                throw new ArgumentNullException("firstLine");
             if (secondLine == null)
-                throw new ArgumentNullException(nameof(secondLine));
+                throw new ArgumentNullException("secondLine");
 
             if (Vector3.AreParallel(firstLine.Direction, secondLine.Direction))
                 throw new ArgumentException("The two lines that define the dimension are parallel.");
@@ -123,11 +123,11 @@ namespace netDxf.Entities
             this.startSecondLine = new Vector2(ocsPoints[2].X, ocsPoints[2].Y);
             this.endSecondLine = new Vector2(ocsPoints[3].X, ocsPoints[3].Y);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Normal = normal;
             this.Elevation = ocsPoints[0].Z;
@@ -170,11 +170,11 @@ namespace netDxf.Entities
             this.endSecondLine = endSecondLine;
 
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Update();
         }
@@ -253,7 +253,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), "The offset value must be equal or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", "The offset value must be equal or greater than zero.");
                 this.offset = value;
             }
         }

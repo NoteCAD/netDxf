@@ -105,7 +105,7 @@ namespace netDxf.Collections
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (!string.Equals(value.ApplicationRegistry.Name, appId, StringComparison.OrdinalIgnoreCase))
                     throw new ArgumentException(string.Format("The extended data application registry name {0} must be equal to the specified appId {1}.", value.ApplicationRegistry.Name, appId));
 
@@ -160,7 +160,7 @@ namespace netDxf.Collections
         public void Add(XData item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             XData xdata;
             if (this.innerDictionary.TryGetValue(item.ApplicationRegistry.Name, out xdata))
             {
@@ -181,7 +181,7 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<XData> items)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                throw new ArgumentNullException("items");
 
             foreach (XData data in items)
             {

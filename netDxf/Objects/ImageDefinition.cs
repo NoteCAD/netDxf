@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using netDxf.Collections;
 using netDxf.Tables;
@@ -109,23 +108,23 @@ namespace netDxf.Objects
             : base(name, DxfObjectCode.ImageDef, false)
         {
             if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException(nameof(file));
+                throw new ArgumentNullException("file");
             this.file = file;
 
             if (width <= 0)
-                throw new ArgumentOutOfRangeException(nameof(width), width, "The ImageDefinition width must be greater than zero.");
+                throw new ArgumentOutOfRangeException("width", width, "The ImageDefinition width must be greater than zero.");
             this.width = width;
 
             if (height <= 0)
-                throw new ArgumentOutOfRangeException(nameof(height), height, "The ImageDefinition height must be greater than zero.");
+                throw new ArgumentOutOfRangeException("height", height, "The ImageDefinition height must be greater than zero.");
             this.height = height;
 
             if (horizontalResolution <= 0)
-                throw new ArgumentOutOfRangeException(nameof(horizontalResolution), horizontalResolution, "The ImageDefinition horizontal resolution must be greater than zero.");
+                throw new ArgumentOutOfRangeException("horizontalResolution", horizontalResolution, "The ImageDefinition horizontal resolution must be greater than zero.");
             this.horizontalResolution = horizontalResolution;
 
             if (verticalResolution <= 0)
-                throw new ArgumentOutOfRangeException(nameof(verticalResolution), verticalResolution, "The ImageDefinition vertical resolution must be greater than zero.");
+                throw new ArgumentOutOfRangeException("verticalResolution", verticalResolution, "The ImageDefinition vertical resolution must be greater than zero.");
             this.verticalResolution = verticalResolution;
 
             this.resolutionUnits = units;
@@ -183,7 +182,7 @@ namespace netDxf.Objects
             : base(name, DxfObjectCode.ImageDef, false)
         {
             if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException(nameof(file), "The image file name should be at least one character long.");
+                throw new ArgumentNullException("file", "The image file name should be at least one character long.");
 
             FileInfo info = new FileInfo(file);
             if (!info.Exists)
@@ -192,7 +191,7 @@ namespace netDxf.Objects
             this.file = file;
 
             try
-            {
+            {	/*
                 using (Image bitmap = Image.FromFile(file))
                 {
                     this.width = bitmap.Width;
@@ -201,7 +200,7 @@ namespace netDxf.Objects
                     this.verticalResolution = bitmap.VerticalResolution;
                     // the System.Drawing.Image stores the image resolution in inches
                     this.resolutionUnits = ImageResolutionUnits.Inches;
-                }
+                }*/
             }
             catch (Exception)
             {

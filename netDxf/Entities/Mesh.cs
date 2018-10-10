@@ -39,9 +39,9 @@ namespace netDxf.Entities
         #region private fields
 
         private const int MaxFaces = 16000000;
-        private readonly IReadOnlyList<Vector3> vertexes;
-        private readonly IReadOnlyList<int[]> faces;
-        private readonly IReadOnlyList<MeshEdge> edges;
+        private readonly List<Vector3> vertexes;
+        private readonly List<int[]> faces;
+        private readonly List<MeshEdge> edges;
         private byte subdivisionLevel;
 
         #endregion
@@ -68,13 +68,13 @@ namespace netDxf.Entities
             : base(EntityType.Mesh, DxfObjectCode.Mesh)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<Vector3>(vertexes);
             if (faces == null)
-                throw new ArgumentNullException(nameof(faces));
+                throw new ArgumentNullException("faces");
             this.faces = new List<int[]>(faces);
             if (this.faces.Count > MaxFaces)
-                throw new ArgumentOutOfRangeException(nameof(faces), this.faces.Count, string.Format("The maximum number of faces in a mesh is {0}", MaxFaces));
+                throw new ArgumentOutOfRangeException("faces", this.faces.Count, string.Format("The maximum number of faces in a mesh is {0}", MaxFaces));
             this.edges = edges == null ? new List<MeshEdge>() : new List<MeshEdge>(edges);
             this.subdivisionLevel = 0;
         }
@@ -86,7 +86,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets the mesh vertexes list.
         /// </summary>
-        public IReadOnlyList<Vector3> Vertexes
+        public List<Vector3> Vertexes
         {
             get { return this.vertexes; }
         }
@@ -94,7 +94,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets the mesh faces list.
         /// </summary>
-        public IReadOnlyList<int[]> Faces
+        public IList<int[]> Faces
         {
             get { return this.faces; }
         }
@@ -102,7 +102,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets the mesh edges list.
         /// </summary>
-        public IReadOnlyList<MeshEdge> Edges
+        public List<MeshEdge> Edges
         {
             get { return this.edges; }
         }

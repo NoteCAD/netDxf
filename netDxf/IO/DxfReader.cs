@@ -132,7 +132,7 @@ namespace netDxf.IO
         {
             long startPosition = stream.Position;
             if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
+                throw new ArgumentNullException("stream");
 
             DxfVersion version = DxfDocument.CheckDxfFileVersion(stream, out this.isBinary);
             stream.Position = startPosition;
@@ -4117,7 +4117,7 @@ namespace netDxf.IO
         private List<Vector3> ReadMeshVertexes(int count)
         {
             if (count <= 0)
-                throw new ArgumentOutOfRangeException(nameof(count), count, "The number of vertexes must be greater than zero.");
+                throw new ArgumentOutOfRangeException("count", count, "The number of vertexes must be greater than zero.");
 
             List<Vector3> vertexes = new List<Vector3>(count);
             for (int i = 0; i < count; i++)

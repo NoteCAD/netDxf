@@ -64,7 +64,7 @@ namespace netDxf.Collections
             if (this.list.Count >= this.MaxCapacity)
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (underlayDgnDefinition == null)
-                throw new ArgumentNullException(nameof(underlayDgnDefinition));
+                throw new ArgumentNullException("underlayDgnDefinition");
 
             UnderlayDgnDefinition add;
             if (this.list.TryGetValue(underlayDgnDefinition.Name, out add))

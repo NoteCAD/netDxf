@@ -96,7 +96,7 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.Layer, checkName)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The layer name should be at least one character long.");
+                throw new ArgumentNullException("name", "The layer name should be at least one character long.");
 
             this.IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
             this.color = AciColor.Default;
@@ -120,7 +120,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -134,9 +134,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (value.IsByLayer || value.IsByBlock)
-                    throw new ArgumentException("The layer color cannot be ByLayer or ByBlock", nameof(value));
+                    throw new ArgumentException("The layer color cannot be ByLayer or ByBlock", "value");
                 this.color = value;
             }
         }
@@ -187,7 +187,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == Lineweight.ByLayer || value == Lineweight.ByBlock)
-                    throw new ArgumentException("The lineweight of a layer cannot be set to ByLayer or ByBlock.", nameof(value));
+                    throw new ArgumentException("The lineweight of a layer cannot be set to ByLayer or ByBlock.", "value");
                 this.lineweight = value;
             }
         }
@@ -201,7 +201,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.transparency = value;
             }
         }

@@ -78,12 +78,12 @@ namespace netDxf.Entities
             : base(EntityType.Insert, DxfObjectCode.Insert)
         {
             if(attributes == null)
-                throw new ArgumentNullException(nameof(attributes));
+                throw new ArgumentNullException("attributes");
             this.attributes = new AttributeCollection(attributes);
             foreach (Attribute att in this.attributes)
             {
                 if(att.Owner!=null)
-                    throw new ArgumentException("The attributes list contains at least an attribute that already has an owner.", nameof(attributes));
+                    throw new ArgumentException("The attributes list contains at least an attribute that already has an owner.", "attributes");
                 att.Owner = this;
             }
 
@@ -119,7 +119,7 @@ namespace netDxf.Entities
             : base(EntityType.Insert, DxfObjectCode.Insert)
         {
             if (block == null)
-                throw new ArgumentNullException(nameof(block));
+                throw new ArgumentNullException("block");
 
             this.block = block;
             this.position = position;

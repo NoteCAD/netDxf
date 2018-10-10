@@ -26,6 +26,7 @@ using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Objects;
 using netDxf.Tables;
+using System.Linq;
 
 namespace netDxf.Collections
 {
@@ -86,10 +87,10 @@ namespace netDxf.Collections
         public new List<DxfObject> GetReferences(Layout item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             List<DxfObject> refs = new List<DxfObject>();
-            refs.AddRange(item.AssociatedBlock.Entities);
-            refs.AddRange(item.AssociatedBlock.AttributeDefinitions.Values);
+            refs.AddRange(item.AssociatedBlock.Entities.Select(x => (DxfObject)x));
+            refs.AddRange(item.AssociatedBlock.AttributeDefinitions.Values.Select(x => (DxfObject) x));
             return refs;
         }
 
@@ -106,7 +107,7 @@ namespace netDxf.Collections
             if (this.list.Count >= this.MaxCapacity)
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (layout == null)
-                throw new ArgumentNullException(nameof(layout));
+                throw new ArgumentNullException("layout");
 
             Layout add;
 

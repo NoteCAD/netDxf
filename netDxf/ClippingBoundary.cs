@@ -38,7 +38,7 @@ namespace netDxf
         #region private fields
 
         private readonly ClippingBoundaryType type;
-        private readonly IReadOnlyList<Vector2> vertexes;
+        private readonly IList<Vector2> vertexes;
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace netDxf
             this.type = ClippingBoundaryType.Polygonal;
             this.vertexes = new List<Vector2>(vertexes);
             if (this.vertexes.Count < 3)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The number of vertexes for the polygonal clipping boundary must be equal or greater than three.");
+                throw new ArgumentOutOfRangeException("vertexes", this.vertexes.Count, "The number of vertexes for the polygonal clipping boundary must be equal or greater than three.");
         }
 
         #endregion
@@ -95,7 +95,7 @@ namespace netDxf
         /// <summary>
         /// Gets the list of vertexes of the polygonal boundary, or the opposite vertexes if the boundary is rectangular.
         /// </summary>
-        public IReadOnlyList<Vector2> Vertexes
+        public IList<Vector2> Vertexes
         {
             get { return this.vertexes; }
         }

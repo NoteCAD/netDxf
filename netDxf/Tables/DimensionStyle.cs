@@ -233,7 +233,7 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.DimStyle, checkName)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The dimension style name should be at least one character long.");
+                throw new ArgumentNullException("name", "The dimension style name should be at least one character long.");
 
             this.IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
 
@@ -329,7 +329,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimclrd = value;
             }
         }
@@ -346,7 +346,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimltype = this.OnLinetypeChangedEvent(this.dimltype, value);
             }
         }
@@ -402,7 +402,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The DimLineExtend must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The DimLineExtend must be equals or greater than zero.");
                 this.dimdle = value;
             }
         }
@@ -421,7 +421,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The DimBaselineSpacing must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The DimBaselineSpacing must be equals or greater than zero.");
                 this.dimdli = value;
             }
         }
@@ -439,7 +439,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimclre = value;
             }
         }
@@ -456,7 +456,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimltex1 = this.OnLinetypeChangedEvent(this.dimltex1, value);
             }
         }
@@ -473,7 +473,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimltex2 = this.OnLinetypeChangedEvent(this.dimltex2, value);
             }
         }
@@ -526,7 +526,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ExtLineOffset must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The ExtLineOffset must be equals or greater than zero.");
                 this.dimexo = value;
             }
         }
@@ -543,7 +543,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ExtLineExtend must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The ExtLineExtend must be equals or greater than zero.");
                 this.dimexe = value;
             }
         }
@@ -572,7 +572,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ExtLineFixedLength must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The ExtLineFixedLength must be equals or greater than zero.");
                 this.dimfxl = value;
             }
         }
@@ -629,7 +629,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ArrowSize must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The ArrowSize must be equals or greater than zero.");
                 this.dimasz = value;
             }
         }
@@ -669,7 +669,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimtxsty = this.OnTextStyleChangedEvent(this.dimtxsty, value);
             }
         }
@@ -687,7 +687,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.dimclrt = value;
             }
         }
@@ -717,7 +717,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The TextHeight must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The TextHeight must be greater than zero.");
                 this.dimtxt = value;
             }
         }
@@ -809,7 +809,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The TextFractionHeightScale must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The TextFractionHeightScale must be greater than zero.");
                 this.dimtfac = value;
             }
         }
@@ -859,7 +859,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The DimScaleOverall must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The DimScaleOverall must be greater than zero.");
                 this.dimscale = value;
             }
         }
@@ -919,7 +919,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < -1)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The AngularPrecision must be greater than -1.");
+                    throw new ArgumentOutOfRangeException("value", value, "The AngularPrecision must be greater than -1.");
                 this.dimadec = value;
             }
         }
@@ -938,7 +938,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The LengthPrecision must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The LengthPrecision must be equals or greater than zero.");
                 this.dimdec = value;
             }
         }
@@ -993,7 +993,7 @@ namespace netDxf.Tables
             set
             {
                 if (MathHelper.IsZero(value))
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The scale factor cannot be zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The scale factor cannot be zero.");
                 this.dimlfac = value;
             }
         }
@@ -1136,7 +1136,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0.000001 && !MathHelper.IsZero(value, double.Epsilon))
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The nearest value to round all distances must be equal or greater than 0.000001 or zero (no rounding off).");
+                    throw new ArgumentOutOfRangeException("value", value, "The nearest value to round all distances must be equal or greater than 0.000001 or zero (no rounding off).");
                 this.dimrnd = value;
             }
         }
@@ -1155,7 +1155,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.alternateUnits = value;
             }
         }
@@ -1173,7 +1173,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.tolerances = value;
             }
         }
@@ -1224,14 +1224,14 @@ namespace netDxf.Tables
                 // symbols and arrows
                 ArrowSize = this.dimasz,
                 CenterMarkSize = this.dimcen,
-                LeaderArrow  = (Block) this.dimldrblk?.Clone(),
-                DimArrow1 = (Block) this.dimblk1?.Clone(),
-                DimArrow2 = (Block) this.dimblk2?.Clone(),
+                LeaderArrow  = (Block) (this.dimldrblk != null ? this.dimldrblk.Clone() : null),
+                DimArrow1 = (Block) (this.dimblk1 != null ? this.dimblk1.Clone() : null),
+                DimArrow2 = (Block) (this.dimblk2 != null ? this.dimblk2.Clone() : null),
 
                 // text appearance
                 TextStyle = (TextStyle) this.dimtxsty.Clone(),
                 TextColor = (AciColor) this.dimclrt.Clone(),
-                TextFillColor = (AciColor) this.dimtfillclr?.Clone(),
+                TextFillColor = (AciColor) (this.dimtfillclr != null ? this.dimtfillclr.Clone() : null),
                 TextHeight = this.dimtxt,
                 TextHorizontalPlacement = this.dimjust,
                 TextVerticalPlacement = this.dimtad,

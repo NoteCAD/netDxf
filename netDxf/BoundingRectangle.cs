@@ -101,7 +101,7 @@ namespace netDxf
         public BoundingRectangle(IEnumerable<Vector2> points)
         {
             if (points == null)
-                throw new ArgumentNullException(nameof(points));
+                throw new ArgumentNullException("points");
 
             double minX = double.MaxValue;
             double minY = double.MaxValue;
@@ -242,7 +242,7 @@ namespace netDxf
         public static BoundingRectangle Union(IEnumerable<BoundingRectangle> rectangles)
         {
             if (rectangles == null)
-                throw new ArgumentNullException(nameof(rectangles));
+                throw new ArgumentNullException("rectangles");
 
             BoundingRectangle rtnAABR = null;
             foreach (BoundingRectangle aabr in rectangles)

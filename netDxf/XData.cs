@@ -52,7 +52,7 @@ namespace netDxf
         public XData(ApplicationRegistry appReg)
         {
             if(appReg == null)
-                throw new ArgumentNullException(nameof(appReg));
+                throw new ArgumentNullException("appReg");
             this.appReg = appReg;
             this.xData = new List<XDataRecord>();
         }

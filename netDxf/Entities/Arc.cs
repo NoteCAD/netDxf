@@ -76,7 +76,7 @@ namespace netDxf.Entities
         {
             this.center = center;
             if (radius <= 0)
-                throw new ArgumentOutOfRangeException(nameof(radius), radius, "The circle radius must be greater than zero.");
+                throw new ArgumentOutOfRangeException("radius", radius, "The circle radius must be greater than zero.");
             this.radius = radius;
             this.startAngle = MathHelper.NormalizeAngle(startAngle);
             this.endAngle = MathHelper.NormalizeAngle(endAngle);
@@ -105,7 +105,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The arc radius must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The arc radius must be greater than zero.");
                 this.radius = value;
             }
         }
@@ -149,7 +149,7 @@ namespace netDxf.Entities
         public List<Vector2> PolygonalVertexes(int precision)
         {
             if (precision < 2)
-                throw new ArgumentOutOfRangeException(nameof(precision), precision, "The arc precision must be greater or equal to three");
+                throw new ArgumentOutOfRangeException("precision", precision, "The arc precision must be greater or equal to three");
 
             List<Vector2> ocsVertexes = new List<Vector2>();
             double start = this.startAngle*MathHelper.DegToRad;

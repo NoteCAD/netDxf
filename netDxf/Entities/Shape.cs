@@ -66,10 +66,10 @@ namespace netDxf.Entities
         public Shape(string name, ShapeStyle style, Vector3 position, double size, double rotation) : base(EntityType.Shape, DxfObjectCode.Shape)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentNullException("name");
             this.name = name;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.position = position;
             this.size = size;
@@ -100,7 +100,7 @@ namespace netDxf.Entities
             internal set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = value;
             }
         }
@@ -129,7 +129,7 @@ namespace netDxf.Entities
             set
             {
                 if (MathHelper.IsZero(value))
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The shape cannot be zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The shape cannot be zero.");
                 this.size = value;
             }
         }
@@ -162,7 +162,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The shape width factor must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The shape width factor must be greater than zero.");
                 this.widthFactor = value;
             }
         }

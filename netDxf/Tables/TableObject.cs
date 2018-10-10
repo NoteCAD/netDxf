@@ -71,7 +71,7 @@ namespace netDxf.Tables
 
         #region private fields
 
-        private static readonly IReadOnlyList<string> invalidCharacters = new[] {"\\", "/", ":", "*", "?", "\"", "<", ">", "|", ";", ",", "=", "`"};
+        private static readonly IList<string> invalidCharacters = new[] {"\\", "/", ":", "*", "?", "\"", "<", ">", "|", ";", ",", "=", "`"};
         private bool reserved;
         private string name;
         private readonly XDataDictionary xData;
@@ -92,7 +92,7 @@ namespace netDxf.Tables
             if (checkName)
             {
                 if (!IsValidName(name))
-                    throw new ArgumentException("The name should be at least one character long and the following characters \\<>/?\":;*|,=` are not supported.", nameof(name));
+                    throw new ArgumentException("The name should be at least one character long and the following characters \\<>/?\":;*|,=` are not supported.", "name");
             }
 
             this.name = name;
@@ -128,7 +128,7 @@ namespace netDxf.Tables
         /// <summary>
         /// Gets the array of characters not supported as table object names.
         /// </summary>
-        public static IReadOnlyList<string> InvalidCharacters
+        public static IList<string> InvalidCharacters
         {
             get { return invalidCharacters; }
         }
@@ -179,14 +179,14 @@ namespace netDxf.Tables
         internal void SetName(string newName, bool checkName)
         {
             if (string.IsNullOrEmpty(newName))
-                throw new ArgumentNullException(nameof(newName));
+                throw new ArgumentNullException("newName");
             if (this.IsReserved)
-                throw new ArgumentException("Reserved table objects cannot be renamed.", nameof(newName));
+                throw new ArgumentException("Reserved table objects cannot be renamed.", "newName");
             if (string.Equals(this.name, newName, StringComparison.OrdinalIgnoreCase))
                 return;
             if (checkName)
                 if (!IsValidName(newName))
-                    throw new ArgumentException("The following characters \\<>/?\":;*|,=` are not supported for table object names.", nameof(newName));
+                    throw new ArgumentException("The following characters \\<>/?\":;*|,=` are not supported for table object names.", "newName");
             this.OnNameChangedEvent(this.name, newName);
             this.name = newName;
         }
@@ -236,7 +236,7 @@ namespace netDxf.Tables
         public int CompareTo(TableObject other)
         {
             if (other == null)
-                throw new ArgumentNullException(nameof(other));
+                throw new ArgumentNullException("other");
 
             return this.GetType() == other.GetType() ? string.Compare(this.Name, other.Name, StringComparison.OrdinalIgnoreCase) : 0;
         }

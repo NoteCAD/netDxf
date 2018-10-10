@@ -72,7 +72,7 @@ namespace netDxf.Entities
             : base(EntityType.LightWeightPolyline, DxfObjectCode.LightWeightPolyline)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<LwPolylineVertex>();
             foreach (Vector2 vertex in vertexes)
                 this.vertexes.Add(new LwPolylineVertex(vertex));
@@ -99,7 +99,7 @@ namespace netDxf.Entities
             : base(EntityType.LightWeightPolyline, DxfObjectCode.LightWeightPolyline)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<LwPolylineVertex>(vertexes);
             this.elevation = 0.0;
             this.thickness = 0.0;

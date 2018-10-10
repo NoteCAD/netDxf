@@ -131,7 +131,7 @@ namespace netDxf.Collections
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (!string.Equals(tag, value.Tag, StringComparison.OrdinalIgnoreCase))
                     throw new ArgumentException(string.Format("The dictionary tag: {0}, and the attribute definition tag: {1}, must be the same", tag, value.Tag));
 
@@ -193,9 +193,9 @@ namespace netDxf.Collections
         public void Add(AttributeDefinition item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             if (this.OnBeforeAddItemEvent(item))
-                throw new ArgumentException("The attribute definition cannot be added to the collection.", nameof(item));
+                throw new ArgumentException("The attribute definition cannot be added to the collection.", "item");
             this.innerDictionary.Add(item.Tag, item);
             this.OnAddItemEvent(item);
         }
@@ -207,7 +207,7 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<AttributeDefinition> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+                throw new ArgumentNullException("collection");
             // we will make room for so the collection will fit without having to resize the internal array during the Add method
             foreach (AttributeDefinition item in collection)
                 this.Add(item);

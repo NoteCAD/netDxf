@@ -60,7 +60,7 @@ namespace netDxf.Entities
             : base(EntityType.Underlay, DxfObjectCode.Underlay)
         {
             if (definition == null)
-                throw new ArgumentNullException(nameof(definition));
+                throw new ArgumentNullException("definition");
             this.definition = definition;
             this.position = Vector3.Zero;
             this.scale = new Vector3(1.0);
@@ -148,7 +148,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 20 || value > 100)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted contrast values range from 20 to 100.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted contrast values range from 20 to 100.");
                 this.contrast = value;
             }
         }
@@ -163,7 +163,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0 || value > 80)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted fade values range from 0 to 80.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted fade values range from 0 to 80.");
                 this.fade = value;
             }
         }

@@ -65,7 +65,7 @@ namespace netDxf.Collections
         public SupportFolders(IEnumerable<string> folders)
         {
             if (folders == null)
-                throw new ArgumentNullException(nameof(folders));
+                throw new ArgumentNullException("folders");
             this.folders = new List<string>();
             this.AddRange(folders);
         }
@@ -110,7 +110,7 @@ namespace netDxf.Collections
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.folders[index] = value;
             }
         }
@@ -158,7 +158,7 @@ namespace netDxf.Collections
         public void Add(string item)
         {
             if(string.IsNullOrEmpty(item))
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             this.folders.Add(item);
         }
 
@@ -169,7 +169,7 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<string> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+                throw new ArgumentNullException("collection");
             foreach (string s in collection)
             {
                 this.folders.Add(s);
@@ -192,7 +192,7 @@ namespace netDxf.Collections
         public bool Contains(string item)
         {
             if (string.IsNullOrEmpty(item))
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             return this.folders.Contains(item);
         }
 
@@ -214,7 +214,7 @@ namespace netDxf.Collections
         public bool Remove(string item)
         {
             if (string.IsNullOrEmpty(item))
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             return this.folders.Remove(item);
         }
 

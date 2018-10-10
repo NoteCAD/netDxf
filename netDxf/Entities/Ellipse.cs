@@ -78,10 +78,10 @@ namespace netDxf.Entities
         {
             this.center = center;
             if (majorAxis <= 0)
-                throw new ArgumentOutOfRangeException(nameof(majorAxis), majorAxis, "The major axis value must be greater than zero.");
+                throw new ArgumentOutOfRangeException("majorAxis", majorAxis, "The major axis value must be greater than zero.");
             this.majorAxis = majorAxis;
             if (minorAxis <= 0)
-                throw new ArgumentOutOfRangeException(nameof(minorAxis), minorAxis, "The minor axis value must be greater than zero.");
+                throw new ArgumentOutOfRangeException("minorAxis", minorAxis, "The minor axis value must be greater than zero.");
             this.minorAxis = minorAxis;
             this.startAngle = 0.0;
             this.endAngle = 0.0;
@@ -112,7 +112,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The major axis value must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The major axis value must be greater than zero.");
                 this.majorAxis = value;
             }
         }
@@ -126,7 +126,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The minor axis value must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The minor axis value must be greater than zero.");
                 this.minorAxis = value;
             }
         }

@@ -95,13 +95,13 @@ namespace netDxf.Tables
             if (string.IsNullOrEmpty(text)) this.text = string.Empty;
             this.text = text;
             if (style == null)
-                throw new ArgumentNullException(nameof(style), "The style must be a valid TextStyle.");
+                throw new ArgumentNullException("style", "The style must be a valid TextStyle.");
             this.style = style;
             this.offset = offset;
             this.rotationType = rotationType;
             this.rotation = MathHelper.NormalizeAngle(rotation);
             if (scale <= 0)
-                throw new ArgumentOutOfRangeException(nameof(scale), scale, "The LinetypeTextSegment scale must be greater than zero.");
+                throw new ArgumentOutOfRangeException("scale", scale, "The LinetypeTextSegment scale must be greater than zero.");
             this.scale = scale;
         }
 
@@ -132,7 +132,7 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }
@@ -177,7 +177,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The linetype text segment scale must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The linetype text segment scale must be greater than zero.");
                 this.scale = value;
             }
         }

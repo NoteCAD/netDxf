@@ -63,7 +63,7 @@ namespace netDxf.Collections
             if (this.list.Count >= this.MaxCapacity)
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (appReg == null)
-                throw new ArgumentNullException(nameof(appReg));
+                throw new ArgumentNullException("appReg");
 
             ApplicationRegistry add;
             if (this.list.TryGetValue(appReg.Name, out add))

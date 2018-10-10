@@ -24,7 +24,13 @@ using System;
 
 namespace netDxf.Blocks
 {
-    /// <summary>
+	static class Ext {
+		public static bool HasFlag(this BlockTypeFlags flags, BlockTypeFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}    
+	
+	/// <summary>
     /// Block-type flags (bit-coded values, may be combined).
     /// </summary>
     [Flags]

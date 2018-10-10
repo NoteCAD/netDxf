@@ -70,7 +70,7 @@ namespace netDxf.Entities
             this.origin = origin;
             this.direction = Vector3.Normalize(direction);
             if (Vector3.IsNaN(this.direction))
-                throw new ArgumentException("The direction can not be the zero vector.", nameof(direction));
+                throw new ArgumentException("The direction can not be the zero vector.", "direction");
         }
 
         #endregion
@@ -96,7 +96,7 @@ namespace netDxf.Entities
             {
                 this.direction = Vector3.Normalize(value);
                 if (Vector3.IsNaN(this.direction))
-                    throw new ArgumentException("The direction can not be the zero vector.", nameof(value));
+                    throw new ArgumentException("The direction can not be the zero vector.", "value");
             }
         }
 

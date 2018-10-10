@@ -196,7 +196,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = this.OnDimensionStyleChangedEvent(this.style, value);
             }
         }
@@ -253,7 +253,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0.25 || value > 4.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The line spacing factor valid values range from 0.25 to 4.00");
+                    throw new ArgumentOutOfRangeException("value", value, "The line spacing factor valid values range from 0.25 to 4.00");
                 this.lineSpacing = value;
             }
         }

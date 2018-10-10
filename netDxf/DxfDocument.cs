@@ -256,7 +256,7 @@ namespace netDxf
             set
             {
                 if (!this.layouts.Contains(value))
-                    throw new ArgumentException(string.Format("The layout {0} does not exist.", value), nameof(value));
+                    throw new ArgumentException(string.Format("The layout {0} does not exist.", value), "value");
                 this.activeLayout = value;
             }
         }
@@ -270,7 +270,7 @@ namespace netDxf
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (string.IsNullOrEmpty(value.Handle))
                     this.NumHandles = value.AsignHandle(this.NumHandles);
                 this.AddedObjects.Add(value.Handle, value);
@@ -733,7 +733,7 @@ namespace netDxf
         public void AddEntity(IEnumerable<EntityObject> entities)
         {
             if (entities == null)
-                throw new ArgumentNullException(nameof(entities));
+                throw new ArgumentNullException("entities");
 
             foreach (EntityObject entity in entities)
             {
@@ -749,7 +749,7 @@ namespace netDxf
         {
             // entities already owned by another document are not allowed
             if (entity.Owner != null)
-                throw new ArgumentException("The entity already belongs to a document. Clone it instead.", nameof(entity));
+                throw new ArgumentException("The entity already belongs to a document. Clone it instead.", "entity");
 
             this.Blocks[this.layouts[this.activeLayout].AssociatedBlock.Name].Entities.Add(entity);
         }
@@ -766,7 +766,7 @@ namespace netDxf
         public void RemoveEntity(IEnumerable<EntityObject> entities)
         {
             if (entities == null)
-                throw new ArgumentNullException(nameof(entities));
+                throw new ArgumentNullException("entities");
 
             foreach (EntityObject entity in entities)
             {
@@ -1092,7 +1092,7 @@ namespace netDxf
         {
             // null entities are not allowed
             if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException("entity");
 
             // assign a handle
             if (assignHandle || string.IsNullOrEmpty(entity.Handle))
@@ -1186,7 +1186,7 @@ namespace netDxf
                     this.shapeStyles.References[shape.Style.Name].Add(shape);
                     //check if the shape style contains a shape with the stored name
                     if(!shape.Style.ContainsShapeName(shape.Name))
-                        throw new ArgumentException("The shape style does not contain a shape with the stored name.", nameof(entity));
+                        throw new ArgumentException("The shape style does not contain a shape with the stored name.", "entity");
                     break;
                 case EntityType.Point:
                     break;
@@ -1279,7 +1279,7 @@ namespace netDxf
         {
             // null entities are not allowed
             if (attDef == null)
-                throw new ArgumentNullException(nameof(attDef));
+                throw new ArgumentNullException("attDef");
 
             // assign a handle
             if (assignHandle || string.IsNullOrEmpty(attDef.Handle))

@@ -114,7 +114,7 @@ namespace netDxf.Collections
         public EntityCollection(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), "The collection capacity cannot be negative.");
+                throw new ArgumentOutOfRangeException("capacity", "The collection capacity cannot be negative.");
             this.innerArray = new List<EntityObject>(capacity);
         }
 
@@ -133,7 +133,7 @@ namespace netDxf.Collections
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
 
                 EntityObject remove = this.innerArray[index];
 
@@ -175,7 +175,7 @@ namespace netDxf.Collections
         public void Add(EntityObject item)
         {
             if (this.OnBeforeAddItemEvent(item))
-                throw new ArgumentException("The entity cannot be added to the collection.", nameof(item));
+                throw new ArgumentException("The entity cannot be added to the collection.", "item");
             this.innerArray.Add(item);
             this.OnAddItemEvent(item);
         }
@@ -187,7 +187,7 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<EntityObject> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+                throw new ArgumentNullException("collection");
             foreach (EntityObject item in collection)
                 this.Add(item);
         }
@@ -204,7 +204,7 @@ namespace netDxf.Collections
             if (this.OnBeforeRemoveItemEvent(this.innerArray[index]))
                 return;
             if (this.OnBeforeAddItemEvent(item))
-                throw new ArgumentException("The entity cannot be added to the collection.", nameof(item));
+                throw new ArgumentException("The entity cannot be added to the collection.", "item");
             this.OnRemoveItemEvent(this.innerArray[index]);
             this.innerArray.Insert(index, item);
             this.OnAddItemEvent(item);
@@ -234,7 +234,7 @@ namespace netDxf.Collections
         public void Remove(IEnumerable<EntityObject> items)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                throw new ArgumentNullException("items");
 
             foreach (EntityObject item in items)
                 this.Remove(item);

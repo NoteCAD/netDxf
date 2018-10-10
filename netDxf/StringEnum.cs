@@ -45,7 +45,7 @@ namespace netDxf
         public StringEnum(Type enumType)
         {
             if (enumType == null)
-                throw new ArgumentNullException(nameof(enumType));
+                throw new ArgumentNullException("enumType");
 
             if (!enumType.IsEnum)
                 throw new ArgumentException(string.Format("The supplied type \"{0}\" must be an Enum.", enumType));
@@ -164,7 +164,7 @@ namespace netDxf
         public static string GetStringValue(Enum value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             string output = null;
             Type type = value.GetType();
@@ -207,7 +207,7 @@ namespace netDxf
         public static object Parse(Type type, string value, StringComparison comparisonType)
         {
             if (type == null)
-                throw new ArgumentNullException(nameof(type));
+                throw new ArgumentNullException("ttfFonttype");
 
             object output = null;
             string enumStringValue = null;

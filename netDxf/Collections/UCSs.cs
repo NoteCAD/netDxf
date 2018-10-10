@@ -64,7 +64,7 @@ namespace netDxf.Collections
             if (this.list.Count >= this.MaxCapacity)
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (ucs == null)
-                throw new ArgumentNullException(nameof(ucs));
+                throw new ArgumentNullException("ucs");
 
             UCS add;
             if (this.list.TryGetValue(ucs.Name, out add))

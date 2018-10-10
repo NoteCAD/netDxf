@@ -60,11 +60,11 @@ namespace netDxf.Entities
         public MeshEdge(int startVertexIndex, int endVertexIndex, double crease)
         {
             if (startVertexIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startVertexIndex), startVertexIndex, "The vertex index must be positive.");
+                throw new ArgumentOutOfRangeException("startVertexIndex", startVertexIndex, "The vertex index must be positive.");
             this.startVertexIndex = startVertexIndex;
 
             if (endVertexIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(endVertexIndex), endVertexIndex, "The vertex index must be positive.");
+                throw new ArgumentOutOfRangeException("endVertexIndex", endVertexIndex, "The vertex index must be positive.");
             this.endVertexIndex = endVertexIndex;
             this.crease = crease < 0.0 ? -1.0 : crease;
         }
@@ -85,7 +85,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The vertex index must be must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The vertex index must be must be equals or greater than zero.");
                 this.startVertexIndex = value;
             }
         }
@@ -99,7 +99,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The vertex index must be must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The vertex index must be must be equals or greater than zero.");
                 this.endVertexIndex = value;
             }
         }

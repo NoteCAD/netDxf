@@ -24,6 +24,11 @@ using System;
 
 namespace netDxf.Entities
 {
+	static class Ext4 {
+		public static bool HasFlag(this PolylinetypeFlags flags, PolylinetypeFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}
     /// <summary>
     /// Defines the polyline type.
     /// </summary>

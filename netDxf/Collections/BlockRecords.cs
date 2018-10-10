@@ -66,7 +66,7 @@ namespace netDxf.Collections
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
 
             if (block == null)
-                throw new ArgumentNullException(nameof(block));
+                throw new ArgumentNullException("block");
 
             Block add;
             if (this.list.TryGetValue(block.Name, out add))

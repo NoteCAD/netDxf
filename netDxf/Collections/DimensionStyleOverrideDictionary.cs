@@ -131,7 +131,7 @@ namespace netDxf.Collections
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (type != value.Type)
                     throw new ArgumentException(string.Format("The dictionary type: {0}, and the DimensionStyleOverride type: {1}, must be the same", type, value.Type));
 
@@ -200,9 +200,9 @@ namespace netDxf.Collections
         public void Add(DimensionStyleOverride item)
         {
             if (item == null)
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException("item");
             if (this.OnBeforeAddItemEvent(item))
-                throw new ArgumentException(string.Format("The DimensionStyleOverride {0} cannot be added to the collection.", item), nameof(item));
+                throw new ArgumentException(string.Format("The DimensionStyleOverride {0} cannot be added to the collection.", item), "item");
             this.innerDictionary.Add(item.Type, item);
             this.OnAddItemEvent(item);
         }
@@ -214,7 +214,7 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<DimensionStyleOverride> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+                throw new ArgumentNullException("collection");
             // we will make room for so the collection will fit without having to resize the internal array during the Add method
             foreach (DimensionStyleOverride item in collection)
                 this.Add(item);

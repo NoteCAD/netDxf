@@ -24,6 +24,11 @@ using System;
 
 namespace netDxf.Entities
 {
+	static class Ext2 {
+		static public bool HasFlag(this VertexTypeFlags flags, VertexTypeFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}
     /// <summary>
     /// Defines the vertex type.
     /// </summary>

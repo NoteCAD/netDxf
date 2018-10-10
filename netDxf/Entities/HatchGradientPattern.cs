@@ -91,7 +91,7 @@ namespace netDxf.Entities
             : base("SOLID", description)
         {
             if (color == null)
-                throw new ArgumentNullException(nameof(color));
+                throw new ArgumentNullException("color");
             this.color1 = color;
             this.color2 = this.Color2FromTint(tint);
             this.singleColor = true;
@@ -122,10 +122,10 @@ namespace netDxf.Entities
             : base("SOLID", description)
         {
             if (color1 == null)
-                throw new ArgumentNullException(nameof(color1));
+                throw new ArgumentNullException("color1");
             this.color1 = color1;
             if (color2 == null)
-                throw new ArgumentNullException(nameof(color2));
+                throw new ArgumentNullException("color2");
             this.color2 = color2;
             this.singleColor = false;
             this.gradientType = type;
@@ -155,7 +155,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.color1 = value;
             }
         }
@@ -172,7 +172,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.singleColor = false;
                 this.color2 = value;
             }

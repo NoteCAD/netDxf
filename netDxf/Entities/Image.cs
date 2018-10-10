@@ -100,15 +100,15 @@ namespace netDxf.Entities
             : base(EntityType.Image, DxfObjectCode.Image)
         {
             if (imageDefinition == null)
-                throw new ArgumentNullException(nameof(imageDefinition));
+                throw new ArgumentNullException("imageDefinition");
 
             this.imageDefinition = imageDefinition;
             this.position = position;
             if (width <= 0)
-                throw new ArgumentOutOfRangeException(nameof(width), width, "The Image width must be greater than zero.");
+                throw new ArgumentOutOfRangeException("width", width, "The Image width must be greater than zero.");
             this.width = width;
             if (height <= 0)
-                throw new ArgumentOutOfRangeException(nameof(height), height, "The Image height must be greater than zero.");
+                throw new ArgumentOutOfRangeException("height", height, "The Image height must be greater than zero.");
             this.height = height;
             this.rotation = 0;
             this.clipping = false;
@@ -141,7 +141,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The Image height must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The Image height must be greater than zero.");
                 this.height = value;
             }
         }
@@ -155,7 +155,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The Image width must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The Image width must be greater than zero.");
                 this.width = value;
             }
         }
@@ -196,7 +196,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0 && value > 100)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted brightness values range from 0 to 100.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted brightness values range from 0 to 100.");
                 this.brightness = value;
             }
         }
@@ -210,7 +210,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0 && value > 100)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted contrast values range from 0 to 100.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted contrast values range from 0 to 100.");
                 this.contrast = value;
             }
         }
@@ -224,7 +224,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0 && value > 100)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted fade values range from 0 to 100.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted fade values range from 0 to 100.");
                 this.fade = value;
             }
         }

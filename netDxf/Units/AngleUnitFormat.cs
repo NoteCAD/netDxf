@@ -41,7 +41,7 @@ namespace netDxf.Units
         public static string ToDecimal(double angle, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -60,7 +60,7 @@ namespace netDxf.Units
         public static string ToDegreesMinutesSeconds(double angle, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             double degrees = angle;
             double minutes = (degrees - (int) degrees)*60;
@@ -91,7 +91,7 @@ namespace netDxf.Units
         public static string ToGradians(double angle, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -110,7 +110,7 @@ namespace netDxf.Units
         public static string ToRadians(double angle, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {

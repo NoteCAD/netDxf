@@ -71,14 +71,14 @@ namespace netDxf.Entities
             : base(DimensionType.Radius)
         {
             if (arc == null)
-                throw new ArgumentNullException(nameof(arc));
+                throw new ArgumentNullException("arc");
 
             Vector3 ocsCenter = MathHelper.Transform(arc.Center, arc.Normal, CoordinateSystem.World, CoordinateSystem.Object);
             this.center = new Vector2(ocsCenter.X, ocsCenter.Y);
             this.refPoint = Vector2.Polar(this.center, arc.Radius, rotation*MathHelper.DegToRad);
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Normal = arc.Normal;
             this.Elevation = ocsCenter.Z;
@@ -107,14 +107,14 @@ namespace netDxf.Entities
             : base(DimensionType.Radius)
         {
             if (circle == null)
-                throw new ArgumentNullException(nameof(circle));
+                throw new ArgumentNullException("circle");
 
             Vector3 ocsCenter = MathHelper.Transform(circle.Center, circle.Normal, CoordinateSystem.World, CoordinateSystem.Object);
             this.center = new Vector2(ocsCenter.X, ocsCenter.Y);
             this.refPoint = Vector2.Polar(this.center, circle.Radius, rotation*MathHelper.DegToRad);
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Normal = circle.Normal;
             this.Elevation = ocsCenter.Z;
@@ -146,7 +146,7 @@ namespace netDxf.Entities
             this.refPoint = referencePoint;
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Update();
         }

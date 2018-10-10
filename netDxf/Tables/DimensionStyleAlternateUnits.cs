@@ -97,7 +97,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The length precision must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The length precision must be equals or greater than zero.");
                 this.dimaltd = value;
             }
         }
@@ -133,7 +133,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The multiplier for alternate units must be greater than zero0.");
+                    throw new ArgumentOutOfRangeException("value", value, "The multiplier for alternate units must be greater than zero0.");
                 this.dimaltf = value;
             }
         }
@@ -223,7 +223,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0.000001 && !MathHelper.IsZero(value, double.Epsilon)) // ToDo check range of values
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The nearest value to round all distances must be equal or greater than 0.000001 or zero (no rounding off).");
+                    throw new ArgumentOutOfRangeException("value", value, "The nearest value to round all distances must be equal or greater than 0.000001 or zero (no rounding off).");
                 this.dimaltrnd = value;
             }
         }

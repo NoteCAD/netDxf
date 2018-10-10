@@ -70,7 +70,7 @@ namespace netDxf.Entities
             : base(EntityType.Polyline, DxfObjectCode.Polyline)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new ObservableCollection<PolylineVertex>();
             this.vertexes.BeforeAddItem += this.Vertexes_BeforeAddItem;
             this.vertexes.AddItem += this.Vertexes_AddItem;
@@ -104,7 +104,7 @@ namespace netDxf.Entities
             : base(EntityType.Polyline, DxfObjectCode.Polyline)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new ObservableCollection<PolylineVertex>();
             this.vertexes.BeforeAddItem += this.Vertexes_BeforeAddItem;
             this.vertexes.AddItem += this.Vertexes_AddItem;

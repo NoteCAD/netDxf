@@ -85,7 +85,7 @@ namespace netDxf.Entities
             : base(EntityType.Hatch, DxfObjectCode.Hatch)
         {
             if (pattern == null)
-                throw new ArgumentNullException(nameof(pattern));
+                throw new ArgumentNullException("pattern");
             this.pattern = pattern;
             this.boundaryPaths = new ObservableCollection<HatchBoundaryPath>();
             this.boundaryPaths.BeforeAddItem += this.BoundaryPaths_BeforeAddItem;
@@ -110,11 +110,11 @@ namespace netDxf.Entities
             : base(EntityType.Hatch, DxfObjectCode.Hatch)
         {
             if (pattern == null)
-                throw new ArgumentNullException(nameof(pattern));
+                throw new ArgumentNullException("pattern");
             this.pattern = pattern;
 
             if (paths == null)
-                throw new ArgumentNullException(nameof(paths));
+                throw new ArgumentNullException("paths");
             this.boundaryPaths = new ObservableCollection<HatchBoundaryPath>();
             this.boundaryPaths.BeforeAddItem += this.BoundaryPaths_BeforeAddItem;
             this.boundaryPaths.AddItem += this.BoundaryPaths_AddItem;
@@ -143,7 +143,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.pattern = value;
             }
         }

@@ -172,7 +172,7 @@ namespace netDxf.Blocks
             : this(name, null, null, true)
         {
             if (string.IsNullOrEmpty(xrefFile))
-                throw new ArgumentNullException(nameof(xrefFile));
+                throw new ArgumentNullException("xrefFile");
 
             this.xrefFile = xrefFile;
             this.flags = BlockTypeFlags.XRef | BlockTypeFlags.ResolvedExternalReference;
@@ -214,7 +214,7 @@ namespace netDxf.Blocks
             : base(name, DxfObjectCode.Block, checkName)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentNullException("name");
 
             this.IsReserved = string.Equals(name, DefaultModelSpaceName, StringComparison.OrdinalIgnoreCase);
             this.forInternalUse = name.StartsWith("*");
@@ -255,7 +255,7 @@ namespace netDxf.Blocks
             set
             {
                 if (this.forInternalUse)
-                    throw new ArgumentException("Blocks for internal use cannot be renamed.", nameof(value));
+                    throw new ArgumentException("Blocks for internal use cannot be renamed.", "value");
                 base.Name = value;
                 this.Record.Name = value;
             }
@@ -289,7 +289,7 @@ namespace netDxf.Blocks
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.layer = this.OnLayerChangedEvent(this.layer, value);
             }
         }
@@ -386,7 +386,7 @@ namespace netDxf.Blocks
         public static Block Create(DxfDocument doc, string name)
         {
             if (doc == null)
-                throw new ArgumentNullException(nameof(doc));
+                throw new ArgumentNullException("doc");
 
             Block block = new Block(name) {Origin = doc.DrawingVariables.InsBase};
             block.Record.Units = doc.DrawingVariables.InsUnits;

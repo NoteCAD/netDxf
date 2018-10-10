@@ -66,7 +66,7 @@ namespace netDxf.Entities
             this.controlPoints = new List<SplineVertex>();
             this.knots = new List<double>();
             if (fitPoints == null)
-                throw new ArgumentNullException(nameof(fitPoints));
+                throw new ArgumentNullException("fitPoints");
             this.fitPoints = new List<Vector3>(fitPoints);
             this.creationMethod = SplineCreationMethod.FitPoints;
             this.isClosed = this.fitPoints[0].Equals(this.fitPoints[this.fitPoints.Count - 1]);
@@ -125,9 +125,9 @@ namespace netDxf.Entities
             : base(EntityType.Spline, DxfObjectCode.Spline)
         {
             if (degree < 1 || degree > 10)
-                throw new ArgumentOutOfRangeException(nameof(degree), degree, "The spline degree valid values range from 1 to 10.");
+                throw new ArgumentOutOfRangeException("degree", degree, "The spline degree valid values range from 1 to 10.");
             if (controlPoints == null)
-                throw new ArgumentNullException(nameof(controlPoints));
+                throw new ArgumentNullException("controlPoints");
             if (controlPoints.Count < 2)
                 throw new ArgumentException("The number of control points must be equal or greater than 2.");
             if (controlPoints.Count < degree + 1)
@@ -161,15 +161,15 @@ namespace netDxf.Entities
             : base(EntityType.Spline, DxfObjectCode.Spline)
         {
             if (degree < 1 || degree > 10)
-                throw new ArgumentOutOfRangeException(nameof(degree), degree, "The spline degree valid values range from 1 to 10.");
+                throw new ArgumentOutOfRangeException("degree", degree, "The spline degree valid values range from 1 to 10.");
             if (controlPoints == null)
-                throw new ArgumentNullException(nameof(controlPoints));
+                throw new ArgumentNullException("controlPoints");
             if (controlPoints.Count < 2)
                 throw new ArgumentException("The number of control points must be equal or greater than 2.");
             if (controlPoints.Count < degree + 1)
                 throw new ArgumentException("The number of control points must be equal or greater than the spline degree + 1.");
             if (knots == null)
-                throw new ArgumentNullException(nameof(knots));
+                throw new ArgumentNullException("knots");
             if (knots.Count != controlPoints.Count + degree + 1)
                 throw new ArgumentException("The number of knots must be equals to the number of control points + spline degree + 1.");
 
@@ -251,7 +251,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The knot tolerance must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The knot tolerance must be greater than zero.");
                 this.knotTolerance = value;
             }
         }
@@ -265,7 +265,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The control point tolerance must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The control point tolerance must be greater than zero.");
                 this.ctrlPointTolerance = value;
             }
         }
@@ -279,7 +279,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The fit tolerance must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The fit tolerance must be greater than zero.");
                 this.fitTolerance = value;
             }
         }
@@ -314,7 +314,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets the spline <see cref="SplineVertex">control points</see> list.
         /// </summary>
-        public IReadOnlyList<SplineVertex> ControlPoints
+        public IList<SplineVertex> ControlPoints
         {
             get { return this.controlPoints; }
         }
@@ -323,7 +323,7 @@ namespace netDxf.Entities
         /// Gets the spline knot vector.
         /// </summary>
         /// <remarks>By default a uniform knot vector is created.</remarks>
-        public IReadOnlyList<double> Knots
+        public IList<double> Knots
         {
             get { return this.knots; }
         }
@@ -593,4 +593,5 @@ namespace netDxf.Entities
 
         #endregion
     }
+
 }

@@ -112,12 +112,12 @@ namespace netDxf.Entities
             : base(EntityType.Leader, DxfObjectCode.Leader)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException(vertexes.GetType().Name);
             this.vertexes = new List<Vector2>(vertexes);
             if (this.vertexes.Count < 2)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The leader vertexes list requires at least two points.");
+                throw new ArgumentOutOfRangeException(vertexes.GetType().Name, this.vertexes.Count, "The leader vertexes list requires at least two points.");
             if(style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.hasHookline = false;
             this.showArrowhead = true;
@@ -148,12 +148,12 @@ namespace netDxf.Entities
             : base(EntityType.Leader, DxfObjectCode.Leader)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<Vector2>(vertexes);
             if (this.vertexes.Count < 2)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The leader vertexes list requires at least two points.");
+                throw new ArgumentOutOfRangeException("vertexes", this.vertexes.Count, "The leader vertexes list requires at least two points.");
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.hasHookline = true;
             this.showArrowhead = true;
@@ -186,12 +186,12 @@ namespace netDxf.Entities
             : base(EntityType.Leader, DxfObjectCode.Leader)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<Vector2>(vertexes);
             if (this.vertexes.Count < 2)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The leader vertexes list requires at least two points.");
+                throw new ArgumentOutOfRangeException("vertexes", this.vertexes.Count, "The leader vertexes list requires at least two points.");
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.hasHookline = false;
             this.showArrowhead = true;
@@ -223,12 +223,12 @@ namespace netDxf.Entities
             : base(EntityType.Leader, DxfObjectCode.Leader)
         {
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<Vector2>(vertexes);
             if (this.vertexes.Count < 2)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The leader vertexes list requires at least two points.");
+                throw new ArgumentOutOfRangeException("vertexes", this.vertexes.Count, "The leader vertexes list requires at least two points.");
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.hasHookline = false;
             this.showArrowhead = true;
@@ -258,7 +258,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = this.OnDimensionStyleChangedEvent(this.style, value);
             }
         }
@@ -321,7 +321,7 @@ namespace netDxf.Entities
                           value.Type == EntityType.Text ||
                           value.Type == EntityType.Insert ||
                           value.Type == EntityType.Tolerance))
-                        throw new ArgumentException("Only MText, Text, Insert, and Tolerance entities are supported as a leader annotation.", nameof(value));
+                        throw new ArgumentException("Only MText, Text, Insert, and Tolerance entities are supported as a leader annotation.", "value");
                 }
 
                 if (ReferenceEquals(this.annotation, value))
@@ -382,7 +382,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.lineColor = value;
             }
         }
@@ -768,7 +768,7 @@ namespace netDxf.Entities
                         dir = Vector2.Rotate(dir, ((Tolerance) this.annotation).Rotation*MathHelper.DegToRad);
                         break;
                     default:
-                        throw new ArgumentException("Only MText, Text, Insert, and Tolerance entities are supported as a leader annotation.", nameof(this.annotation));
+                        throw new ArgumentException("Only MText, Text, Insert, and Tolerance entities are supported as a leader annotation.", "annotation");
                 }
             }
             return  this.Hook - dir * arrowSize * dimScale;
@@ -840,7 +840,7 @@ namespace netDxf.Entities
                 PathType = this.pathType,
                 Offset = this.offset,
                 LineColor = this.lineColor,
-                Annotation = (EntityObject) this.annotation?.Clone(),
+                Annotation = (EntityObject) (this.annotation != null ? this.annotation.Clone() : null),
                 hasHookline = this.hasHookline // do not call directly the property, the vertexes list already includes it if it has a hook line
             };
 

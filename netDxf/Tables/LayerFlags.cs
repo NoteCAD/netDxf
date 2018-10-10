@@ -24,7 +24,12 @@ using System;
 
 namespace netDxf.Tables
 {
-    /// <summary>
+	static class Ext2 {
+		static public bool HasFlag(this LayerFlags flags, LayerFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}       
+	/// <summary>
     /// Standard layer flags (bit-coded values).
     /// </summary>
     [Flags]

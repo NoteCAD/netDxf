@@ -84,7 +84,7 @@ namespace netDxf.Entities
             : base(EntityType.Wipeout, DxfObjectCode.Wipeout)
         {
             if (clippingBoundary == null)
-                throw new ArgumentNullException(nameof(clippingBoundary));
+                throw new ArgumentNullException("clippingBoundary");
             this.clippingBoundary = clippingBoundary;
             this.elevation = 0.0;
         }
@@ -102,7 +102,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.clippingBoundary = value;
             }
         }

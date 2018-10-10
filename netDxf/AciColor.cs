@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Threading;
 
@@ -37,7 +36,7 @@ namespace netDxf
     {
         #region list of the indexed colors
 
-        private static readonly IReadOnlyDictionary<byte, byte[]> indexRgb = new Dictionary<byte, byte[]>
+        private static readonly Dictionary<byte, byte[]> indexRgb = new Dictionary<byte, byte[]>
         {
             {1, new byte[] {255, 0, 0}},
             {2, new byte[] {255, 255, 0}},
@@ -401,7 +400,7 @@ namespace netDxf
         /// <summary>
         /// A dictionary that contains the indexed colors, the key represents the color index and the value the RGB components of the color.
         /// </summary>
-        public static IReadOnlyDictionary<byte, byte[]> IndexRgb
+        public static Dictionary<byte, byte[]> IndexRgb
         {
             get { return indexRgb; }
         }
@@ -461,16 +460,6 @@ namespace netDxf
         /// <summary>
         /// Initializes a new instance of the <c>AciColor</c> class.
         /// </summary>
-        /// <param name="color">A <see cref="Color">color</see>.</param>
-        /// <remarks>By default the UseTrueColor will be set to true.</remarks>
-        public AciColor(Color color)
-            : this(color.R, color.G, color.B)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <c>AciColor</c> class.
-        /// </summary>
         /// <param name="index">Color index.</param>
         /// <remarks>
         /// By default the UseTrueColor will be set to false.<br />
@@ -480,7 +469,7 @@ namespace netDxf
         public AciColor(short index)
         {
             if (index <= 0 || index >= 256)
-                throw new ArgumentOutOfRangeException(nameof(index), index, "Accepted color index values range from 1 to 255.");
+                throw new ArgumentOutOfRangeException((index).GetType().Name, index, "Accepted color index values range from 1 to 255.");
 
             byte[] rgb = IndexRgb[(byte) index];
             this.r = rgb[0];
@@ -560,7 +549,7 @@ namespace netDxf
             set
             {
                 if (value <= 0 || value >= 256)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted color index values range from 1 to 255.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted color index values range from 1 to 255.");
 
                 this.index = value;
                 byte[] rgb = IndexRgb[(byte) this.index];
@@ -655,7 +644,7 @@ namespace netDxf
         public static void ToHsl(AciColor color, out double hue, out double saturation, out double lightness)
         {
             if (color == null)
-                throw new ArgumentNullException(nameof(color));
+                throw new ArgumentNullException("color");
 
             double red = color.R/255.0;
             double green = color.G/255.0;
@@ -706,31 +695,6 @@ namespace netDxf
         }
 
         /// <summary>
-        /// Converts the AciColor to a <see cref="Color">color</see>.
-        /// </summary>
-        /// <returns>A <see cref="Color">System.Drawing.Color</see> that represents the actual AciColor.</returns>
-        /// <remarks>A default color white will be used for ByLayer and ByBlock colors.</remarks>
-        public Color ToColor()
-        {
-            if (this.index < 1 || this.index > 255) //default color definition for ByLayer and ByBlock colors
-                return Color.White;
-            return Color.FromArgb(this.r, this.g, this.b);
-        }
-
-        /// <summary>
-        /// Converts a <see cref="Color">color</see> to an <see cref="Color">AciColor</see>.
-        /// </summary>
-        /// <param name="color">A <see cref="Color">color</see>.</param>
-        public void FromColor(Color color)
-        {
-            this.r = color.R;
-            this.g = color.G;
-            this.b = color.B;
-            this.useTrueColor = true;
-            this.index = RgbToAci(this.r, this.g, this.b);
-        }
-
-        /// <summary>
         /// Gets the entity 24-bit color value from an AciColor.
         /// </summary>
         /// <param name="color">A <see cref="AciColor">color</see>.</param>
@@ -738,7 +702,7 @@ namespace netDxf
         public static int ToTrueColor(AciColor color)
         {
             if (color == null)
-                throw new ArgumentNullException(nameof(color));
+                throw new ArgumentNullException("color");
 
             return BitConverter.ToInt32(new byte[] {color.B, color.G, color.R, 0}, 0);
         }
@@ -766,7 +730,7 @@ namespace netDxf
         public static AciColor FromCadIndex(short index)
         {
             if (index < 0 || index > 256)
-                throw new ArgumentOutOfRangeException(nameof(index), index, "Accepted CAD indexed AciColor values range from 0 to 256.");
+                throw new ArgumentOutOfRangeException("index", index, "Accepted CAD indexed AciColor values range from 0 to 256.");
 
             if (index == 0)
                 return ByBlock;

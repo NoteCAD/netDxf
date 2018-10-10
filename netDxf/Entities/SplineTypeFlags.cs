@@ -24,6 +24,11 @@ using System;
 
 namespace netDxf.Entities
 {
+	static class Ext5 {
+		public static bool HasFlag(this SplinetypeFlags flags, SplinetypeFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}
     /// <summary>
     /// Defines the spline type.
     /// </summary>

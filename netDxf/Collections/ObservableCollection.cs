@@ -111,7 +111,7 @@ namespace netDxf.Collections
         public ObservableCollection(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), "The collection capacity cannot be negative.");
+                throw new ArgumentOutOfRangeException("capacity", "The collection capacity cannot be negative.");
             this.innerArray = new List<T>(capacity);
         }
 
@@ -215,7 +215,7 @@ namespace netDxf.Collections
         public void Add(T item)
         {
             if (this.OnBeforeAddItemEvent(item))
-                throw new ArgumentException("The item cannot be added to the collection.", nameof(item));
+                throw new ArgumentException("The item cannot be added to the collection.", "item");
             this.innerArray.Add(item);
             this.OnAddItemEvent(item);
         }
@@ -227,7 +227,7 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<T> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+                throw new ArgumentNullException("collection");
 
             foreach (T item in collection)
                 this.Add(item);
@@ -246,7 +246,7 @@ namespace netDxf.Collections
             if (this.OnBeforeRemoveItemEvent(this.innerArray[index]))
                 return;
             if (this.OnBeforeAddItemEvent(item))
-                throw new ArgumentException("The item cannot be added to the collection.", nameof(item));
+                throw new ArgumentException("The item cannot be added to the collection.", "item");
             this.OnRemoveItemEvent(this.innerArray[index]);
             this.innerArray.Insert(index, item);
             this.OnAddItemEvent(item);
@@ -276,7 +276,7 @@ namespace netDxf.Collections
         public void Remove(IEnumerable<T> items)
         {
             if (items == null)
-                throw new ArgumentNullException(nameof(items));
+                throw new ArgumentNullException("items");
 
             foreach (T item in items)
             {

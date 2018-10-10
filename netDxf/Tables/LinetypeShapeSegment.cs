@@ -93,16 +93,16 @@ namespace netDxf.Tables
         public LinetypeShapeSegment(string name, ShapeStyle style, double length, Vector2 offset, LinetypeSegmentRotationType rotationType, double rotation, double scale) : base(LinetypeSegmentType.Shape, length)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The linetype shape name should be at least one character long.");
+                throw new ArgumentNullException("name", "The linetype shape name should be at least one character long.");
             this.name = name;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.offset = offset;
             this.rotationType = rotationType;
             this.rotation = MathHelper.NormalizeAngle(rotation);
             if (scale <= 0)
-                throw new ArgumentOutOfRangeException(nameof(scale), scale, "The LinetypeShepeSegment scale must be greater than zero.");
+                throw new ArgumentOutOfRangeException("scale", scale, "The LinetypeShepeSegment scale must be greater than zero.");
             this.scale = scale;
         }
 
@@ -124,7 +124,7 @@ namespace netDxf.Tables
             internal set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException(nameof(value), "The linetype shape name should be at least one character long.");
+                    throw new ArgumentNullException("value", "The linetype shape name should be at least one character long.");
                 this.name = value;
             }
         }
@@ -141,7 +141,7 @@ namespace netDxf.Tables
             internal set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = value;
             }
         }
@@ -185,7 +185,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The linetype shape segment scale must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The linetype shape segment scale must be greater than zero.");
                 this.scale = value;
             }
         }

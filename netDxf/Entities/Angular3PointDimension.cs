@@ -71,7 +71,7 @@ namespace netDxf.Entities
             : base(DimensionType.Angular3Point)
         {
             if (arc == null)
-                throw new ArgumentNullException(nameof(arc));
+                throw new ArgumentNullException("arc");
 
             Vector3 refPoint = MathHelper.Transform(arc.Center, arc.Normal, CoordinateSystem.World, CoordinateSystem.Object);
             this.center = new Vector2(refPoint.X, refPoint.Y);
@@ -79,11 +79,11 @@ namespace netDxf.Entities
             this.end = Vector2.Polar(this.center, arc.Radius, arc.EndAngle*MathHelper.DegToRad);
 
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Normal = arc.Normal;
             this.Elevation = refPoint.Z;
@@ -117,10 +117,10 @@ namespace netDxf.Entities
             this.start = startPoint;
             this.end = endPoint;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Update();
         }
@@ -176,7 +176,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), "The offset value must be equal or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", "The offset value must be equal or greater than zero.");
                 this.offset = value;
             }
         }

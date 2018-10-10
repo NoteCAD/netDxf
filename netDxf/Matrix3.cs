@@ -82,7 +82,7 @@ namespace netDxf
         public Matrix3(double[] array)
         {
             if (array == null)
-                throw new ArgumentNullException(nameof(array));
+                throw new ArgumentNullException("array");
 
             if (array.Length != 9)
                 throw new ArgumentException("The array must contain 9 elements.");

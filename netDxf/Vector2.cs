@@ -71,10 +71,10 @@ namespace netDxf
         public Vector2(double[] array)
         {
             if (array == null)
-                throw new ArgumentNullException(nameof(array));
+                throw new ArgumentNullException("array");
 
             if (array.Length != 2)
-                throw new ArgumentOutOfRangeException(nameof(array), array.Length, "The dimension of the array must be two");
+                throw new ArgumentOutOfRangeException("array", array.Length, "The dimension of the array must be two");
             this.x = array[0];
             this.y = array[1];
             this.isNormalized = false;
@@ -161,7 +161,7 @@ namespace netDxf
                     case 1:
                         return this.y;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(index));
+                        throw new ArgumentOutOfRangeException("index");
                 }
             }
             set
@@ -176,7 +176,7 @@ namespace netDxf
                         this.y = value;
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(index));
+                        throw new ArgumentOutOfRangeException("index");
                 }
             }
         }

@@ -24,7 +24,13 @@ using System;
 
 namespace netDxf.Entities
 {
-    /// <summary>
+	static class Ext {
+		static public bool HasFlag(this HatchBoundaryPathTypeFlags flags, HatchBoundaryPathTypeFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}
+	
+	/// <summary>
     /// Defines the boundary path type of the hatch.
     /// </summary>
     /// <remarks>Bit flag.</remarks>

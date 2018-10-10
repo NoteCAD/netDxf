@@ -77,7 +77,7 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.VPort, checkName)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The viewport name should be at least one character long.");
+                throw new ArgumentNullException("name", "The viewport name should be at least one character long.");
 
             this.IsReserved = name.Equals("*Active", StringComparison.OrdinalIgnoreCase);
             this.center = Vector2.Zero;
@@ -142,7 +142,7 @@ namespace netDxf.Tables
             {
                 this.direction = Vector3.Normalize(value);
                 if (Vector3.IsNaN(this.direction))
-                    throw new ArgumentException("The direction can not be the zero vector.", nameof(value));
+                    throw new ArgumentException("The direction can not be the zero vector.", "value");
             }
         }
 
@@ -173,7 +173,7 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value,
+                    throw new ArgumentOutOfRangeException("value", value,
                         "The VPort aspect ratio must be greater than zero.");
                 this.aspectRatio = value;
             }

@@ -98,7 +98,7 @@ namespace netDxf.Entities
             : base(DimensionType.Aligned)
         {
             if (referenceLine == null)
-                throw new ArgumentNullException(nameof(referenceLine));
+                throw new ArgumentNullException("referenceLine");
 
             IList<Vector3> ocsPoints = MathHelper.Transform(
                 new List<Vector3> { referenceLine.StartPoint, referenceLine.EndPoint }, normal, CoordinateSystem.World, CoordinateSystem.Object);
@@ -106,10 +106,10 @@ namespace netDxf.Entities
             this.secondRefPoint = new Vector2(ocsPoints[1].X, ocsPoints[1].Y);
 
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Normal = normal;
             this.Elevation = ocsPoints[0].Z;
@@ -142,10 +142,10 @@ namespace netDxf.Entities
             this.firstRefPoint = firstPoint;
             this.secondRefPoint = secondPoint;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
             this.Update();
         }
@@ -193,7 +193,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), "The offset value must be equal or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", "The offset value must be equal or greater than zero.");
                 this.offset = value;
             }
         }

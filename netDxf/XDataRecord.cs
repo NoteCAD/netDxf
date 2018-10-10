@@ -71,29 +71,29 @@ namespace netDxf
         public XDataRecord(XDataCode code, object value)
         {
             if(value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             switch (code)
             {
                 case XDataCode.AppReg:
-                    throw new ArgumentException("An application registry cannot be an extended data record.", nameof(value));
+                    throw new ArgumentException("An application registry cannot be an extended data record.", "value");
                 case XDataCode.BinaryData:
                     if (!(value is byte[]))
-                        throw new ArgumentException("The value of a XDataCode.BinaryData must be a byte array.", nameof(value));
+                        throw new ArgumentException("The value of a XDataCode.BinaryData must be a byte array.", "value");
                     break;
                 case XDataCode.ControlString:
                     string v = value as string;
                     if (string.IsNullOrEmpty(v))
-                        throw new ArgumentException("The value of a XDataCode.ControlString must be a string.", nameof(value));
+                        throw new ArgumentException("The value of a XDataCode.ControlString must be a string.", "value");
                     if (!string.Equals(v, "{") && !string.Equals(v, "}"))
-                        throw new ArgumentException("The only valid values of a XDataCode.ControlString are { or }.", nameof(value));
+                        throw new ArgumentException("The only valid values of a XDataCode.ControlString are { or }.", "value");
                     break;
                 case XDataCode.DatabaseHandle:
                     if (!(value is string))
-                        throw new ArgumentException("The value of a XDataCode.DatabaseHandle must be an hexadecimal number.", nameof(value));
+                        throw new ArgumentException("The value of a XDataCode.DatabaseHandle must be an hexadecimal number.", "value");
                     long test;
                     if (!long.TryParse((string) value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out test))
-                        throw new ArgumentException("The value of a XDataCode.DatabaseHandle must be an hexadecimal number.", nameof(value));
+                        throw new ArgumentException("The value of a XDataCode.DatabaseHandle must be an hexadecimal number.", "value");
                     value = test.ToString("X");
                     break;
                 case XDataCode.Distance:
@@ -112,20 +112,20 @@ namespace netDxf
                 case XDataCode.WorldSpaceDisplacementY:
                 case XDataCode.WorldSpaceDisplacementZ:
                     if (!(value is double))
-                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (double)), nameof(value));
+                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (double)), "value");
                     break;
                 case XDataCode.Int16:
                     if (!(value is short))
-                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (short)), nameof(value));
+                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (short)), "value");
                     break;
                 case XDataCode.Int32:
                     if (!(value is int))
-                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be an {1}.", code, typeof (int)), nameof(value));
+                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be an {1}.", code, typeof (int)), "value");
                     break;
                 case XDataCode.LayerName:
                 case XDataCode.String:
                     if (!(value is string))
-                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (string)), nameof(value));
+                        throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (string)), "value");
                     break;
             }
             this.code = code;

@@ -88,7 +88,7 @@ namespace netDxf.Entities
             this.axis = vec.Y > vec.X ? OrdinateDimensionAxis.X : OrdinateDimensionAxis.Y;
             this.rotation = 0.0;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
         }
 
@@ -110,7 +110,7 @@ namespace netDxf.Entities
             this.axis = axis;
             this.rotation = 0.0;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
         }
 
@@ -174,7 +174,7 @@ namespace netDxf.Entities
             this.axis = axis;
 
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.Style = style;
 
             double angle = rotation * MathHelper.DegToRad;

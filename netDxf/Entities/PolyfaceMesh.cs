@@ -56,16 +56,16 @@ namespace netDxf.Entities
         {
             this.flags = PolylinetypeFlags.PolyfaceMesh;
             if (vertexes == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.vertexes = new List<PolyfaceMeshVertex>(vertexes);
             if (this.vertexes.Count < 3)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The polyface mesh faces list requires at least three points.");
+                throw new ArgumentOutOfRangeException("vertexes", this.vertexes.Count, "The polyface mesh faces list requires at least three points.");
 
             if (faces == null)
-                throw new ArgumentNullException(nameof(vertexes));
+                throw new ArgumentNullException("vertexes");
             this.faces = new List<PolyfaceMeshFace>(faces);
             if (this.faces.Count < 1)
-                throw new ArgumentOutOfRangeException(nameof(vertexes), this.faces.Count, "The polyface mesh faces list requires at least one face.");
+                throw new ArgumentOutOfRangeException("vertexes", this.faces.Count, "The polyface mesh faces list requires at least one face.");
 
             this.endSequence = new EndSequence(this);
         }
@@ -77,7 +77,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets or sets the polyface mesh <see cref="PolyfaceMeshVertex">vertexes</see>.
         /// </summary>
-        public IReadOnlyList<PolyfaceMeshVertex> Vertexes
+        public IList<PolyfaceMeshVertex> Vertexes
         {
             get { return this.vertexes; }
         }
@@ -85,7 +85,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets or sets the polyface mesh <see cref="PolyfaceMeshFace">faces</see>.
         /// </summary>
-        public IReadOnlyList<PolyfaceMeshFace> Faces
+        public IList<PolyfaceMeshFace> Faces
         {
             get { return this.faces; }
         }

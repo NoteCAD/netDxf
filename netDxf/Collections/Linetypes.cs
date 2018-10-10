@@ -163,7 +163,7 @@ namespace netDxf.Collections
             if (this.list.Count >= this.MaxCapacity)
                 throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (linetype == null)
-                throw new ArgumentNullException(nameof(linetype));
+                throw new ArgumentNullException("linetype");
 
             Linetype add;
 
@@ -187,7 +187,7 @@ namespace netDxf.Collections
                     shapeSegment.Style = this.Owner.ShapeStyles.Add(shapeSegment.Style);
                     this.Owner.ShapeStyles.References[shapeSegment.Style.Name].Add(linetype);
                     if(!shapeSegment.Style.ContainsShapeName(shapeSegment.Name))
-                        throw new ArgumentException("The linetype contains a shape segment which style does not contain a shape with the stored name.", nameof(linetype));
+                        throw new ArgumentException("The linetype contains a shape segment which style does not contain a shape with the stored name.", "linetype");
                 }
             }
 

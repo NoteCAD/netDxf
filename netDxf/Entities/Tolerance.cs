@@ -181,7 +181,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = this.OnDimensionStyleChangedEvent(this.style, value);
             }
         }

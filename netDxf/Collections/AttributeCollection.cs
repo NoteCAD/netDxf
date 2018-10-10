@@ -23,6 +23,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using netDxf.Entities;
 using Attribute = netDxf.Entities.Attribute;
 
 namespace netDxf.Collections
@@ -31,7 +32,7 @@ namespace netDxf.Collections
     /// Represents a collection of <see cref="Entities.Attribute">Attributes</see>.
     /// </summary>
     public sealed class AttributeCollection :
-        IReadOnlyList<Attribute>
+        IList<Attribute>
     {
         #region private fields
 
@@ -56,7 +57,7 @@ namespace netDxf.Collections
         public AttributeCollection(IEnumerable<Attribute> attributes)
         {
             if (attributes == null)
-                throw new ArgumentNullException(nameof(attributes));
+                throw new ArgumentNullException("attributes");
             this.innerArray = new List<Attribute>(attributes);
         }
 
@@ -72,20 +73,28 @@ namespace netDxf.Collections
             get { return this.innerArray.Count; }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the collection is read-only.
-        /// </summary>
-        public static bool IsReadOnly
-        {
-            get { return true; }
-        }
+		public bool IsReadOnly {
+			get {
+				throw new NotImplementedException();
+			}
+		}
 
-        /// <summary>
-        /// Gets the attribute at the specified index.
-        /// </summary>
-        /// <param name="index"> The zero-based index of the element to get or set.</param>
-        /// <returns>The object at the specified index.</returns>
-        public Attribute this[int index]
+		Attribute IList<Attribute>.this[int index] {
+			get {
+				throw new NotImplementedException();
+			}
+
+			set {
+				throw new NotImplementedException();
+			}
+		}
+
+		/// <summary>
+		/// Gets the attribute at the specified index.
+		/// </summary>
+		/// <param name="index"> The zero-based index of the element to get or set.</param>
+		/// <returns>The object at the specified index.</returns>
+		public Attribute this[int index]
         {
             get { return this.innerArray[index]; }
         }
@@ -161,6 +170,26 @@ namespace netDxf.Collections
             return this.GetEnumerator();
         }
 
-        #endregion
-    }
+		public void Insert(int index, Attribute item) {
+			throw new NotImplementedException();
+		}
+
+		public void RemoveAt(int index) {
+			throw new NotImplementedException();
+		}
+
+		public void Add(Attribute item) {
+			throw new NotImplementedException();
+		}
+
+		public void Clear() {
+			throw new NotImplementedException();
+		}
+
+		public bool Remove(Attribute item) {
+			throw new NotImplementedException();
+		}
+
+		#endregion
+	}
 }

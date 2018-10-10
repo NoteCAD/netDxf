@@ -242,7 +242,7 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.Linetype, checkName)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The line type name should be at least one character long.");
+                throw new ArgumentNullException("name", "The line type name should be at least one character long.");
 
             this.IsReserved = name.Equals(ByLayerName, StringComparison.OrdinalIgnoreCase) ||
                               name.Equals(ByBlockName, StringComparison.OrdinalIgnoreCase) ||

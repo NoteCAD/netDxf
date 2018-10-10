@@ -24,7 +24,12 @@ using System;
 
 namespace netDxf.Entities
 {
-    /// <summary>
+	static class Ext1 {
+		public static bool HasFlag(this MLineFlags flags, MLineFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}    
+	/// <summary>
     /// Flags (bit-coded values).
     /// </summary>
     [Flags]

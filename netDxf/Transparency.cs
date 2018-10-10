@@ -82,7 +82,7 @@ namespace netDxf
         public Transparency(short value)
         {
             if (value < 0 || value > 90)
-                throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted transparency values range from 0 to 90.");
+                throw new ArgumentOutOfRangeException("value", value, "Accepted transparency values range from 0 to 90.");
             this.transparency = value;
         }
 
@@ -118,7 +118,7 @@ namespace netDxf
             set
             {
                 if (value < 0 || value > 90)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted transparency values range from 0 to 90.");
+                    throw new ArgumentOutOfRangeException("value", value, "Accepted transparency values range from 0 to 90.");
                 this.transparency = value;
             }
         }
@@ -135,7 +135,7 @@ namespace netDxf
         public static int ToAlphaValue(Transparency transparency)
         {
             if (transparency == null)
-                throw new ArgumentNullException(nameof(transparency));
+                throw new ArgumentNullException("transparency");
 
             byte alpha = (byte) (255*(100 - transparency.Value)/100.0);
             byte[] bytes = {alpha, 0, 0, 2};

@@ -109,7 +109,7 @@ namespace netDxf.Objects
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.color = value;
             }
         }
@@ -123,7 +123,7 @@ namespace netDxf.Objects
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -144,7 +144,7 @@ namespace netDxf.Objects
         public int CompareTo(MLineStyleElement other)
         {
             if (other == null)
-                throw new ArgumentNullException(nameof(other));
+                throw new ArgumentNullException("other");
 
             return this.offset.CompareTo(other.offset);
         }

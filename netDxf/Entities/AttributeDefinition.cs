@@ -159,20 +159,20 @@ namespace netDxf.Entities
             : base(DxfObjectCode.AttributeDefinition)
         {
             if (string.IsNullOrEmpty(tag))
-                throw new ArgumentNullException(nameof(tag));
+                throw new ArgumentNullException("tag");
 
             if (tag.Contains(" "))
-                throw new ArgumentException("The tag string cannot contain spaces.", nameof(tag));
+                throw new ArgumentException("The tag string cannot contain spaces.", "tag");
             this.tag = tag;
             this.flags = AttributeFlags.Visible;
             this.prompt = string.Empty;
             this.attValue = null;
             this.position = Vector3.Zero;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             if (textHeight <= 0.0)
-                throw new ArgumentOutOfRangeException(nameof(textHeight), this.attValue, "The attribute definition text height must be greater than zero.");
+                throw new ArgumentOutOfRangeException("textHeight", this.attValue, "The attribute definition text height must be greater than zero.");
             this.height = textHeight;
             this.widthFactor = style.WidthFactor;
             this.obliqueAngle = style.ObliqueAngle;
@@ -207,7 +207,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.color = value;
             }
         }
@@ -221,7 +221,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.layer = this.OnLayerChangedEvent(this.layer, value);
             }
         }
@@ -235,7 +235,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -258,7 +258,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.transparency = value;
             }
         }
@@ -272,7 +272,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The line type scale must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The line type scale must be greater than zero.");
                 this.linetypeScale = value;
             }
         }
@@ -296,7 +296,7 @@ namespace netDxf.Entities
             {
                 this.normal = Vector3.Normalize(value);
                 if (Vector3.IsNaN(this.normal))
-                    throw new ArgumentException("The normal can not be the zero vector.", nameof(value));
+                    throw new ArgumentException("The normal can not be the zero vector.", "value");
             }
         }
 
@@ -327,7 +327,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The height should be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The height should be greater than zero.");
                 this.height = value;
             }
         }
@@ -341,7 +341,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The width factor should be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The width factor should be greater than zero.");
                 this.widthFactor = value;
             }
         }
@@ -356,7 +356,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < -85.0 || value > 85.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The oblique angle valid values range from -85 to 85.");
+                    throw new ArgumentOutOfRangeException("value", value, "The oblique angle valid values range from -85 to 85.");
                 this.obliqueAngle = value;
             }
         }
@@ -382,7 +382,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }

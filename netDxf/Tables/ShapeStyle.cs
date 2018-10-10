@@ -79,7 +79,7 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.TextStyle, true)
         {
             if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException(nameof(file));
+                throw new ArgumentNullException("file");
             this.file = file;
             this.size = size;
             this.widthFactor = widthFactor;

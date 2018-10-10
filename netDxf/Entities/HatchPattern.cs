@@ -270,7 +270,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The scale can not be zero or less.");
+                    throw new ArgumentOutOfRangeException("value", value, "The scale can not be zero or less.");
                 this.scale = value;
             }
         }

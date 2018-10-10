@@ -146,7 +146,7 @@ namespace netDxf.Objects
             : base(name, DxfObjectCode.MLineStyle, true)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The multiline style name should be at least one character long.");
+                throw new ArgumentNullException("name", "The multiline style name should be at least one character long.");
 
             this.flags = MLineStyleFlags.None;
             this.description = string.IsNullOrEmpty(description) ? string.Empty : description;
@@ -163,7 +163,7 @@ namespace netDxf.Objects
             this.elements.Sort(); // the elements list must be ordered
 
             if (this.elements.Count < 1)
-                throw new ArgumentOutOfRangeException(nameof(elements), this.elements.Count, "The elements list must have at least one element.");
+                throw new ArgumentOutOfRangeException("elements", this.elements.Count, "The elements list must have at least one element.");
         }
 
         #endregion
@@ -200,7 +200,7 @@ namespace netDxf.Objects
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.fillColor = value;
             }
         }
@@ -214,7 +214,7 @@ namespace netDxf.Objects
             set
             {
                 if (value < 10.0 || value > 170.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MLine style start angle valid values range from 10 to 170 degrees.");
+                    throw new ArgumentOutOfRangeException("value", value, "The MLine style start angle valid values range from 10 to 170 degrees.");
                 this.startAngle = value;
             }
         }
@@ -228,7 +228,7 @@ namespace netDxf.Objects
             set
             {
                 if (value < 10.0 || value > 170.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MLine style end angle valid values range from 10 to 170 degrees.");
+                    throw new ArgumentOutOfRangeException("value", value, "The MLine style end angle valid values range from 10 to 170 degrees.");
                 this.endAngle = value;
             }
         }

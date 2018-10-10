@@ -41,7 +41,7 @@ namespace netDxf.Units
         public static string ToScientific(double length, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -60,7 +60,7 @@ namespace netDxf.Units
         public static string ToDecimal(double length, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -80,7 +80,7 @@ namespace netDxf.Units
         public static string ToArchitectural(double length, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             int feet = (int) (length/12);
             double inchesDec = length - 12*feet;
@@ -167,7 +167,7 @@ namespace netDxf.Units
         public static string ToEngineering(double length, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -212,7 +212,7 @@ namespace netDxf.Units
         public static string ToFractional(double length, UnitStyleFormat format)
         {
             if (format == null)
-                throw new ArgumentNullException(nameof(format));
+                throw new ArgumentNullException("format");
 
             int num = (int) length;
             int numerator;

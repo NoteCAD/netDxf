@@ -237,11 +237,11 @@ namespace netDxf.Entities
             this.position = position;
             this.attachmentPoint = MTextAttachmentPoint.TopLeft;
             if (style == null)
-                throw new ArgumentNullException(nameof(style));
+                throw new ArgumentNullException("style");
             this.style = style;
             this.rectangleWidth = rectangleWidth;
             if (height <= 0.0)
-                throw new ArgumentOutOfRangeException(nameof(height), this.text, "The MText height must be greater than zero.");
+                throw new ArgumentOutOfRangeException("height", this.text, "The MText height must be greater than zero.");
             this.height = height;
             this.lineSpacing = 1.0;
             this.paragraphHeightFactor = 1.0;
@@ -272,7 +272,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MText height must be greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The MText height must be greater than zero.");
                 this.height = value;
             }
         }
@@ -289,7 +289,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0.25 || value > 4.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MText LineSpacingFactor valid values range from 0.25 to 4.00");
+                    throw new ArgumentOutOfRangeException("value", value, "The MText LineSpacingFactor valid values range from 0.25 to 4.00");
                 this.lineSpacing = value;
             }
         }
@@ -306,7 +306,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0.25 || value > 4.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MText ParagraphHeightFactor valid values range from 0.25 to 4.00");
+                    throw new ArgumentOutOfRangeException("value", value, "The MText ParagraphHeightFactor valid values range from 0.25 to 4.00");
                 this.paragraphHeightFactor = value;
             }
         }
@@ -343,7 +343,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MText rectangle width must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The MText rectangle width must be equals or greater than zero.");
                 this.rectangleWidth = value;
             }
         }
@@ -366,7 +366,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }

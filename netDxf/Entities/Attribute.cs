@@ -131,7 +131,7 @@ namespace netDxf.Entities
             : base(DxfObjectCode.Attribute)
         {
             if (definition == null)
-                throw new ArgumentNullException(nameof(definition));
+                throw new ArgumentNullException(definition.GetType().Name);
 
             this.color = definition.Color;
             this.layer = definition.Layer;
@@ -168,7 +168,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(value.GetType().Name);
                 this.color = value;
             }
         }
@@ -182,7 +182,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(value.GetType().Name);
                 this.layer = this.OnLayerChangedEvent(this.layer, value);
             }
         }
@@ -196,7 +196,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(value.GetType().Name);
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -219,7 +219,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.transparency = value;
             }
         }
@@ -233,7 +233,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The line type scale must be greater than zero.");
+                    throw new ArgumentOutOfRangeException(value.GetType().Name, value, "The line type scale must be greater than zero.");
                 this.linetypeScale = value;
             }
         }
@@ -257,7 +257,7 @@ namespace netDxf.Entities
             {
                 this.normal = Vector3.Normalize(value);
                 if (Vector3.IsNaN(this.normal))
-                    throw new ArgumentException("The normal can not be the zero vector.", nameof(value));
+                    throw new ArgumentException("The normal can not be the zero vector.", value.GetType().Name);
             }
         }
 
@@ -298,7 +298,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The height should be greater than zero.");
+                    throw new ArgumentOutOfRangeException(value.GetType().Name, value, "The height should be greater than zero.");
                 this.height = value;
             }
         }
@@ -312,7 +312,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The width factor should be greater than zero.");
+                    throw new ArgumentOutOfRangeException(value.GetType().Name, value, "The width factor should be greater than zero.");
                 this.widthFactor = value;
             }
         }
@@ -327,7 +327,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < -85.0 || value > 85.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The oblique angle valid values range from -85 to 85.");
+                    throw new ArgumentOutOfRangeException("value", value, "The oblique angle valid values range from -85 to 85.");
                 this.obliqueAngle = value;
             }
         }
@@ -353,7 +353,7 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(value.GetType().Name);
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }
@@ -416,7 +416,7 @@ namespace netDxf.Entities
                 Normal = this.Normal,
                 IsVisible = this.isVisible,
                 //Attribute properties
-                Definition = (AttributeDefinition) this.definition?.Clone(),
+                Definition = (AttributeDefinition) (this.definition != null ? this.definition.Clone() : null),
                 Tag = this.tag,
                 Height = this.height,
                 WidthFactor = this.widthFactor,

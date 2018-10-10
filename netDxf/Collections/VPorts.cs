@@ -72,7 +72,7 @@ namespace netDxf.Collections
         /// </returns>
         internal override VPort Add(VPort vport, bool assignHandle)
         {
-            throw new ArgumentException("VPorts cannot be added to the collection. There is only one VPort in the list the \"*Active\".", nameof(vport));
+            throw new ArgumentException("VPorts cannot be added to the collection. There is only one VPort in the list the \"*Active\".", "vport");
 
             //if (this.list.Count >= this.maxCapacity)
             //    throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.codeName, this.maxCapacity));
@@ -99,7 +99,7 @@ namespace netDxf.Collections
         /// <remarks>Reserved viewports or any other referenced by objects cannot be removed.</remarks>
         public override bool Remove(string name)
         {
-            throw new ArgumentException("VPorts cannot be removed from the collection.", nameof(name));
+            throw new ArgumentException("VPorts cannot be removed from the collection.", "name");
 
             //return this.Remove(this[name]);
         }
@@ -112,7 +112,7 @@ namespace netDxf.Collections
         /// <remarks>Reserved viewports or any other referenced by objects cannot be removed.</remarks>
         public override bool Remove(VPort item)
         {
-            throw new ArgumentException("VPorts cannot be removed from the collection.", nameof(item));
+            throw new ArgumentException("VPorts cannot be removed from the collection.", "item");
 
             //if (vport == null)
             //    return false;

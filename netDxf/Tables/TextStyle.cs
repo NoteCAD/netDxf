@@ -23,7 +23,6 @@
 using System;
 using System.IO;
 using netDxf.Collections;
-using System.Drawing.Text;
 
 namespace netDxf.Tables
 {
@@ -99,11 +98,11 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.TextStyle, checkName)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name), "The text style name should be at least one character long.");
+                throw new ArgumentNullException("name", "The text style name should be at least one character long.");
             this.IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
 
             if (string.IsNullOrEmpty(font))
-                throw new ArgumentNullException(nameof(font));
+                throw new ArgumentNullException("font");
 
             if (!Path.GetExtension(font).Equals(".TTF", StringComparison.InvariantCultureIgnoreCase) &&
                 !Path.GetExtension(font).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
@@ -167,7 +166,7 @@ namespace netDxf.Tables
             this.isBackward = false;
             this.isUpsideDown = false;
             if(string.IsNullOrEmpty(fontFamily))
-                throw new ArgumentNullException(nameof(fontFamily));
+                throw new ArgumentNullException("fontFamily");
             this.fontFamilyName = fontFamily;
             this.fontStyle = fontStyle;
         }
@@ -190,7 +189,7 @@ namespace netDxf.Tables
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
 
                 if (!Path.GetExtension(value).Equals(".TTF", StringComparison.InvariantCultureIgnoreCase) &&
                     !Path.GetExtension(value).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
@@ -220,7 +219,7 @@ namespace netDxf.Tables
                     if (!Path.GetExtension(this.file).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
                         throw new NullReferenceException("The Big Font is only applicable for SHX Asian fonts.");
                     if(!Path.GetExtension(value).Equals(".SHX", StringComparison.InvariantCultureIgnoreCase))
-                        throw new ArgumentException("The Big Font is only applicable for SHX Asian fonts.", nameof(value));
+                        throw new ArgumentException("The Big Font is only applicable for SHX Asian fonts.", "value");
                     this.bigFont = value;
                 }               
             }
@@ -240,7 +239,7 @@ namespace netDxf.Tables
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 this.file = string.Empty;
                 this.bigFont = string.Empty;
                 this.fontFamilyName = value;
@@ -282,7 +281,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The TextStyle height must be equals or greater than zero.");
+                    throw new ArgumentOutOfRangeException("value", value, "The TextStyle height must be equals or greater than zero.");
                 this.height = value;
             }
         }
@@ -297,7 +296,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0.01 || value > 100.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The TextStyle width factor valid values range from 0.01 to 100.");
+                    throw new ArgumentOutOfRangeException("value", value, "The TextStyle width factor valid values range from 0.01 to 100.");
                 this.widthFactor = value;
             }
         }
@@ -312,7 +311,7 @@ namespace netDxf.Tables
             set
             {
                 if (value < -85.0 || value > 85.0)
-                    throw new ArgumentOutOfRangeException(nameof(value), value, "The TextStyle oblique angle valid values range from -85 to 85.");
+                    throw new ArgumentOutOfRangeException("value", value, "The TextStyle oblique angle valid values range from -85 to 85.");
                 this.obliqueAngle = value;
             }
         }
@@ -359,7 +358,8 @@ namespace netDxf.Tables
 
         private static string TrueTypeFontFamilyName(string ttfFont)
         {
-            if (string.IsNullOrEmpty(ttfFont)) throw new ArgumentNullException(nameof(ttfFont));
+			/*
+            if (string.IsNullOrEmpty(ttfFont)) throw new ArgumentNullException("ttfFont");
 
             // the following information is only applied to TTF not SHX fonts
             if (!Path.GetExtension(ttfFont).Equals(".TTF", StringComparison.InvariantCultureIgnoreCase))
@@ -379,6 +379,8 @@ namespace netDxf.Tables
             PrivateFontCollection fontCollection = new PrivateFontCollection();
             fontCollection.AddFontFile(fontFile);
             return fontCollection.Families[0].Name;
+			*/
+			return "";
         }
 
         #endregion

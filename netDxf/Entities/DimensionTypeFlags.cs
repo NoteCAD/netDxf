@@ -24,7 +24,12 @@ using System;
 
 namespace netDxf.Entities
 {
-    /// <summary>
+	static class Ext3 {
+		static public bool HasFlag(this DimensionTypeFlags flags, DimensionTypeFlags flag) {
+			return (flags & flag) != 0;
+		}
+	}    
+	/// <summary>
     /// Dimension type.
     /// </summary>
     [Flags]
