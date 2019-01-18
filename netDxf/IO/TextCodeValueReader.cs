@@ -157,8 +157,8 @@ namespace netDxf.IO
             long test;
             if (long.TryParse(this.value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out test))
                 return test.ToString("X");
-
-            throw new Exception(string.Format("Value {0} not valid at line {1}", this.value, this.currentPosition));
+			return this.value;
+            //throw new Exception(string.Format("Value {0} not valid at line {1}", this.value, this.currentPosition));
         }
 
         public override string ToString()
