@@ -1,25 +1,29 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
+using System.Collections.Generic;
 using System.IO;
 using netDxf.Collections;
 using netDxf.Tables;
@@ -38,6 +42,9 @@ namespace netDxf.Objects
         /// Initializes a new instance of the <c>UnderlayDwfDefinition</c> class.
         /// </summary>
         /// <param name="file">Underlay file name with full or relative path.</param>
+        /// <remarks>
+        /// The file extension must match the underlay type.
+        /// </remarks>
         public UnderlayDwfDefinition(string file)
             : this(Path.GetFileNameWithoutExtension(file), file)
         {
@@ -48,6 +55,9 @@ namespace netDxf.Objects
         /// </summary>
         /// <param name="name">Underlay definition name.</param>
         /// <param name="file">Underlay file name with full or relative path.</param>
+        /// <remarks>
+        /// The file extension must match the underlay type.
+        /// </remarks>
         public UnderlayDwfDefinition(string name, string file)
             : base(name, file, UnderlayType.DWF)
         {
@@ -71,6 +81,41 @@ namespace netDxf.Objects
         #region overrides
 
         /// <summary>
+        /// Checks if this instance has been referenced by other DxfObjects. 
+        /// </summary>
+        /// <returns>
+        /// Returns true if this instance has been referenced by other DxfObjects, false otherwise.
+        /// It will always return false if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same value as the HasReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public override bool HasReferences()
+        {
+            return this.Owner != null && this.Owner.HasReferences(this.Name);
+        }
+
+        /// <summary>
+        /// Gets the list of DxfObjects referenced by this instance.
+        /// </summary>
+        /// <returns>
+        /// A list of DxfObjectReference that contains the DxfObject referenced by this instance and the number of times it does.
+        /// It will return null if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same list as the GetReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public override List<DxfObjectReference> GetReferences()
+        {
+            if (this.Owner == null)
+            {
+                return null;
+            }
+
+            return this.Owner.GetReferences(this.Name);
+        }
+
+        /// <summary>
         /// Creates a new UnderlayDwfDefinition that is a copy of the current instance.
         /// </summary>
         /// <param name="newName">UnderlayDwfDefinition name of the copy.</param>
@@ -80,7 +125,9 @@ namespace netDxf.Objects
             UnderlayDwfDefinition copy = new UnderlayDwfDefinition(newName, this.File);
 
             foreach (XData data in this.XData.Values)
+            {
                 copy.XData.Add((XData)data.Clone());
+            }
 
             return copy;
         }

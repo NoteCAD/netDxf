@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -36,31 +39,29 @@ namespace netDxf.Objects
         #region delegates and events
 
         public delegate void MLineStyleElementAddedEventHandler(MLineStyle sender, MLineStyleElementChangeEventArgs e);
-
         public event MLineStyleElementAddedEventHandler MLineStyleElementAdded;
-
         protected virtual void OnMLineStyleElementAddedEvent(MLineStyleElement item)
         {
             MLineStyleElementAddedEventHandler ae = this.MLineStyleElementAdded;
             if (ae != null)
+            {
                 ae(this, new MLineStyleElementChangeEventArgs(item));
+            }
         }
 
         public delegate void MLineStyleElementRemovedEventHandler(MLineStyle sender, MLineStyleElementChangeEventArgs e);
-
         public event MLineStyleElementRemovedEventHandler MLineStyleElementRemoved;
-
         protected virtual void OnMLineStyleElementRemovedEvent(MLineStyleElement item)
         {
             MLineStyleElementRemovedEventHandler ae = this.MLineStyleElementRemoved;
             if (ae != null)
+            {
                 ae(this, new MLineStyleElementChangeEventArgs(item));
+            }
         }
 
         public delegate void MLineStyleElementLinetypeChangedEventHandler(MLineStyle sender, TableObjectChangedEventArgs<Linetype> e);
-
         public event MLineStyleElementLinetypeChangedEventHandler MLineStyleElementLinetypeChanged;
-
         protected virtual Linetype OnMLineStyleElementLinetypeChangedEvent(Linetype oldLinetype, Linetype newLinetype)
         {
             MLineStyleElementLinetypeChangedEventHandler ae = this.MLineStyleElementLinetypeChanged;
@@ -146,7 +147,9 @@ namespace netDxf.Objects
             : base(name, DxfObjectCode.MLineStyle, true)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name", "The multiline style name should be at least one character long.");
+            {
+                throw new ArgumentNullException(nameof(name), "The multiline style name should be at least one character long.");
+            }
 
             this.flags = MLineStyleFlags.None;
             this.description = string.IsNullOrEmpty(description) ? string.Empty : description;
@@ -163,7 +166,9 @@ namespace netDxf.Objects
             this.elements.Sort(); // the elements list must be ordered
 
             if (this.elements.Count < 1)
-                throw new ArgumentOutOfRangeException("elements", this.elements.Count, "The elements list must have at least one element.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(elements), this.elements.Count, "The elements list must have at least one element.");
+            }
         }
 
         #endregion
@@ -192,29 +197,30 @@ namespace netDxf.Objects
         /// Gets or sets the MLine fill color.
         /// </summary>
         /// <remarks>
-        /// AutoCad2000 dxf version does not support true colors for MLineStyle fill color.
+        /// AutoCad2000 DXF version does not support true colors for MLineStyle fill color.
         /// </remarks>
         public AciColor FillColor
         {
             get { return this.fillColor; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-                this.fillColor = value;
+                this.fillColor = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
         /// <summary>
         /// Gets or sets the MLine start angle in degrees.
         /// </summary>
+        /// <remarks>Valid values range from 10.0 to 170.0 degrees. Default: 90.0.</remarks>
         public double StartAngle
         {
             get { return this.startAngle; }
             set
             {
                 if (value < 10.0 || value > 170.0)
-                    throw new ArgumentOutOfRangeException("value", value, "The MLine style start angle valid values range from 10 to 170 degrees.");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MLine style start angle valid values range from 10 to 170 degrees.");
+                }
                 this.startAngle = value;
             }
         }
@@ -222,13 +228,16 @@ namespace netDxf.Objects
         /// <summary>
         /// Gets or sets the MLine end angle in degrees.
         /// </summary>
+        /// <remarks>Valid values range from 10.0 to 170.0 degrees. Default: 90.0.</remarks>
         public double EndAngle
         {
             get { return this.endAngle; }
             set
             {
                 if (value < 10.0 || value > 170.0)
-                    throw new ArgumentOutOfRangeException("value", value, "The MLine style end angle valid values range from 10 to 170 degrees.");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The MLine style end angle valid values range from 10 to 170 degrees.");
+                }
                 this.endAngle = value;
             }
         }
@@ -237,8 +246,10 @@ namespace netDxf.Objects
         /// Gets the list of elements that make up the multiline.
         /// </summary>
         /// <remarks>
-        /// The elements list must be ordered, this will be done automatically,
-        /// but if new elements are added individually to the list it will have to be sorted manually calling the Sort() method.
+        /// The elements list must be ordered from larger to smaller <see cref="MLineStyleElement.Offset">offset</see> values.
+        /// During the initialization process the list will be sorted automatically,
+        /// but if new elements are added individually to the list or the offset values of individual elements are modified,
+        /// it will have to be sorted manually calling the Sort() method.
         /// </remarks>
         public ObservableCollection<MLineStyleElement> Elements
         {
@@ -259,6 +270,41 @@ namespace netDxf.Objects
         #region overrides
 
         /// <summary>
+        /// Checks if this instance has been referenced by other DxfObjects. 
+        /// </summary>
+        /// <returns>
+        /// Returns true if this instance has been referenced by other DxfObjects, false otherwise.
+        /// It will always return false if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same value as the HasReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public override bool HasReferences()
+        {
+            return this.Owner != null && this.Owner.HasReferences(this.Name);
+        }
+
+        /// <summary>
+        /// Gets the list of DxfObjects referenced by this instance.
+        /// </summary>
+        /// <returns>
+        /// A list of DxfObjectReference that contains the DxfObject referenced by this instance and the number of times it does.
+        /// It will return null if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same list as the GetReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public override List<DxfObjectReference> GetReferences()
+        {
+            if (this.Owner == null)
+            {
+                return null;
+            }
+
+            return this.Owner.GetReferences(this.Name);
+        }
+
+        /// <summary>
         /// Creates a new MLineStyle that is a copy of the current instance.
         /// </summary>
         /// <param name="newName">MLineStyle name of the copy.</param>
@@ -267,7 +313,9 @@ namespace netDxf.Objects
         {
             List<MLineStyleElement> copyElements = new List<MLineStyleElement>();
             foreach (MLineStyleElement e in this.elements)
+            {
                 copyElements.Add((MLineStyleElement) e.Clone());
+            }
 
             MLineStyle copy = new MLineStyle(newName, copyElements)
             {
@@ -279,7 +327,9 @@ namespace netDxf.Objects
             };
 
             foreach (XData data in this.XData.Values)
+            {
                 copy.XData.Add((XData)data.Clone());
+            }
 
             return copy;
         }
@@ -301,9 +351,13 @@ namespace netDxf.Objects
         {
             // null items are not allowed
             if (e.Item == null)
+            {
                 e.Cancel = true;
+            }
             else
+            {
                 e.Cancel = false;
+            }
         }
 
         private void Elements_AddItem(ObservableCollection<MLineStyleElement> sender, ObservableCollectionEventArgs<MLineStyleElement> e)

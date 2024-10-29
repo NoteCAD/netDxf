@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -98,19 +101,19 @@ namespace netDxf.Entities
             : base(DimensionType.Aligned)
         {
             if (referenceLine == null)
-                throw new ArgumentNullException("referenceLine");
+            {
+                throw new ArgumentNullException(nameof(referenceLine));
+            }
 
-            IList<Vector3> ocsPoints = MathHelper.Transform(
-                new List<Vector3> { referenceLine.StartPoint, referenceLine.EndPoint }, normal, CoordinateSystem.World, CoordinateSystem.Object);
+            List<Vector3> ocsPoints = MathHelper.Transform(
+                new List<Vector3> { referenceLine.StartPoint, referenceLine.EndPoint },
+                normal,
+                CoordinateSystem.World,
+                CoordinateSystem.Object);
             this.firstRefPoint = new Vector2(ocsPoints[0].X, ocsPoints[0].Y);
             this.secondRefPoint = new Vector2(ocsPoints[1].X, ocsPoints[1].Y);
-
-            if (offset < 0)
-                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
             this.Normal = normal;
             this.Elevation = ocsPoints[0].Z;
             this.Update();
@@ -141,12 +144,9 @@ namespace netDxf.Entities
         {
             this.firstRefPoint = firstPoint;
             this.secondRefPoint = secondPoint;
-            if (offset < 0)
-                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
             this.offset = offset;
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
+
             this.Update();
         }
 
@@ -184,24 +184,17 @@ namespace netDxf.Entities
         /// Gets or sets the distance between the reference line and the dimension line.
         /// </summary>
         /// <remarks>
-        /// The offset value must be equal or greater than zero.<br />
-        /// The side at which the dimension line is drawn depends of the direction of its reference line.
+        /// The positive side at which the dimension line is drawn depends of the direction of its reference line.
         /// </remarks>
         public double Offset
         {
             get { return this.offset; }
-            set
-            {
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException("value", "The offset value must be equal or greater than zero.");
-                this.offset = value;
-            }
+            set { this.offset = value; }
         }
 
         /// <summary>
         /// Actual measurement.
         /// </summary>
-        /// <remarks>The dimension is always measured in the plane defined by the normal.</remarks>
         public override double Measurement
         {
             get { return Vector2.Distance(this.firstRefPoint, this.secondRefPoint); }
@@ -217,20 +210,14 @@ namespace netDxf.Entities
         /// <param name="point">Point along the dimension line.</param>
         public void SetDimensionLinePosition(Vector2 point)
         {
-            Vector2 refDir = Vector2.Normalize(this.secondRefPoint - this.firstRefPoint);
+            Vector2 refDir = this.secondRefPoint - this.firstRefPoint;
             Vector2 offsetDir = point - this.firstRefPoint;
 
             double cross = Vector2.CrossProduct(refDir, offsetDir);
-            if (cross < 0)
-            {
-                Vector2 tmp = this.firstRefPoint;
-                this.firstRefPoint = this.secondRefPoint;
-                this.secondRefPoint = tmp;
-                refDir *= -1;
-            }
+            refDir.Normalize();
 
             Vector2 vec = Vector2.Perpendicular(refDir);
-            this.offset = MathHelper.PointLineDistance(point, this.firstRefPoint, refDir);
+            this.offset = Math.Sign(cross) * MathHelper.PointLineDistance(point, this.firstRefPoint, refDir);
             this.defPoint = this.secondRefPoint + this.offset * vec;
 
             if (!this.TextPositionManuallySet)
@@ -239,12 +226,12 @@ namespace netDxf.Entities
                 double textGap = this.Style.TextOffset;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
                 {
-                    textGap = (double)styleOverride.Value;
+                    textGap = (double) styleOverride.Value;
                 }
                 double scale = this.Style.DimScaleOverall;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
                 {
-                    scale = (double)styleOverride.Value;
+                    scale = (double) styleOverride.Value;
                 }
 
                 double gap = this.offset + textGap * scale;
@@ -257,9 +244,57 @@ namespace netDxf.Entities
         #region overrides
 
         /// <summary>
+        /// Moves, scales, and/or rotates the current entity given a 3x3 transformation matrix and a translation vector.
+        /// </summary>
+        /// <param name="transformation">Transformation matrix.</param>
+        /// <param name="translation">Translation vector.</param>
+        /// <remarks>Matrix3 adopts the convention of using column vectors to represent a transformation matrix.</remarks>
+        public override void TransformBy(Matrix3 transformation, Vector3 translation)
+        {
+            Vector3 newNormal = transformation * this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+
+            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
+
+            Vector3 v;
+                
+            v = transOW * new Vector3(this.FirstReferencePoint.X, this.FirstReferencePoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newStart = new Vector2(v.X, v.Y);
+            double newElevation = v.Z;
+
+            v = transOW * new Vector3(this.SecondReferencePoint.X, this.SecondReferencePoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newEnd = new Vector2(v.X, v.Y);
+
+            if (this.TextPositionManuallySet)
+            {
+                v = transOW * new Vector3(this.textRefPoint.X, this.textRefPoint.Y, this.Elevation);
+                v = transformation * v + translation;
+                v = transWO * v;
+                this.textRefPoint = new Vector2(v.X, v.Y);
+            }
+
+            v = transOW * new Vector3(this.defPoint.X, this.defPoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            this.defPoint = new Vector2(v.X, v.Y);
+
+            this.FirstReferencePoint = newStart;
+            this.SecondReferencePoint = newEnd;
+            this.Elevation = newElevation;
+            this.Normal = newNormal;
+
+            this.SetDimensionLinePosition(this.defPoint);
+        }
+
+        /// <summary>
         /// Calculate the dimension reference points.
         /// </summary>
-        protected override void CalculteReferencePoints()
+        protected override void CalculateReferencePoints()
         {
             DimensionStyleOverride styleOverride;
 
@@ -267,7 +302,7 @@ namespace netDxf.Entities
             Vector2 ref2 = this.SecondReferencePoint;
             Vector2 dirRef = ref2 - ref1;
             Vector2 dirDesp = Vector2.Normalize(Vector2.Perpendicular(dirRef));
-            Vector2 vec = this.offset* dirDesp;
+            Vector2 vec = this.offset * dirDesp;
             Vector2 dimRef1 = ref1 + vec;
             Vector2 dimRef2 = ref2 + vec;
 
@@ -299,8 +334,8 @@ namespace netDxf.Entities
                     scale = (double) styleOverride.Value;
                 }
 
-                double gap = textGap*scale;
-                this.textRefPoint = Vector2.MidPoint(dimRef1, dimRef2) + gap*dirDesp;
+                double gap = textGap * scale;
+                this.textRefPoint = Vector2.MidPoint(dimRef1, dimRef2) + gap * dirDesp;
             }
         }
 
@@ -350,15 +385,14 @@ namespace netDxf.Entities
 
             foreach (DimensionStyleOverride styleOverride in this.StyleOverrides.Values)
             {
-                object copy;
-                ICloneable value = styleOverride.Value as ICloneable;
-                copy = value != null ? value.Clone() : styleOverride.Value;
-
+                object copy = styleOverride.Value is ICloneable value ? value.Clone() : styleOverride.Value;
                 entity.StyleOverrides.Add(new DimensionStyleOverride(styleOverride.Type, copy));
             }
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -55,12 +58,12 @@ namespace netDxf.Entities
                 DecimalSeparator = style.DecimalSeparator.ToString(),
                 FractionHeightScale = style.TextFractionHeightScale,
                 FractionType = style.FractionType,
-                SupressLinearLeadingZeros = style.SuppressLinearLeadingZeros,
-                SupressLinearTrailingZeros = style.SuppressLinearTrailingZeros,
-                SupressAngularLeadingZeros = style.SuppressAngularLeadingZeros,
-                SupressAngularTrailingZeros = style.SuppressAngularTrailingZeros,
-                SupressZeroFeet = style.SuppressZeroFeet,
-                SupressZeroInches = style.SuppressZeroInches
+                SuppressLinearLeadingZeros = style.SuppressLinearLeadingZeros,
+                SuppressLinearTrailingZeros = style.SuppressLinearTrailingZeros,
+                SuppressAngularLeadingZeros = style.SuppressAngularLeadingZeros,
+                SuppressAngularTrailingZeros = style.SuppressAngularTrailingZeros,
+                SuppressZeroFeet = style.SuppressZeroFeet,
+                SuppressZeroInches = style.SuppressZeroInches
             };
 
             if (dimType== DimensionType.Angular || dimType == DimensionType.Angular3Point)
@@ -94,14 +97,20 @@ namespace netDxf.Entities
                     {
                         // if DIMLFAC is negative the scale value is only applied to dimensions in PaperSpace
                         if (style.DimScaleLinear < 0 && !layout.IsPaperSpace)
+                        {
                             scale = 1.0;
+                        }
                     }
                 }
-                
+
                 if (style.DimRoundoff > 0.0)
+                {
                     measure = MathHelper.RoundToNearest(measure*scale, style.DimRoundoff);
+                }
                 else
+                {
                     measure *= scale;
+                }
 
                 switch (style.DimLengthUnits)
                 {
@@ -130,9 +139,15 @@ namespace netDxf.Entities
 
             string prefix = string.Empty;
             if (dimType == DimensionType.Diameter)
+            {
                 prefix = string.IsNullOrEmpty(style.DimPrefix) ? "Ø" : style.DimPrefix;
+            }
+
             if (dimType == DimensionType.Radius)
+            {
                 prefix = string.IsNullOrEmpty(style.DimPrefix) ? "R" : style.DimPrefix;
+            }
+
             dimText = string.Format("{0}{1}{2}", prefix, dimText, style.DimSuffix);
 
             if (!string.IsNullOrEmpty(userText))
@@ -147,7 +162,9 @@ namespace netDxf.Entities
                     {
                         int j = i + 1;
                         if (j >= userText.Length)
+                        {
                             break;
+                        }
 
                         if (userText[j].Equals('X'))
                         {
@@ -177,8 +194,8 @@ namespace netDxf.Entities
 
         private static Line DimensionLine(Vector2 start, Vector2 end, double rotation, DimensionStyle style)
         {
-            double ext1 = style.ArrowSize*style.DimScaleOverall;
-            double ext2 = -style.ArrowSize*style.DimScaleOverall;
+            double ext1 = style.ArrowSize * style.DimScaleOverall;
+            double ext2 = -style.ArrowSize * style.DimScaleOverall;
 
             Block block;
 
@@ -190,7 +207,9 @@ namespace netDxf.Entities
                     block.Name.Equals("_ARCHTICK", StringComparison.OrdinalIgnoreCase) ||
                     block.Name.Equals("_INTEGRAL", StringComparison.OrdinalIgnoreCase) ||
                     block.Name.Equals("_NONE", StringComparison.OrdinalIgnoreCase))
+                {
                     ext1 = -style.DimLineExtend*style.DimScaleOverall;
+                }
             }
 
             //end arrow
@@ -201,7 +220,9 @@ namespace netDxf.Entities
                     block.Name.Equals("_ARCHTICK", StringComparison.OrdinalIgnoreCase) ||
                     block.Name.Equals("_INTEGRAL", StringComparison.OrdinalIgnoreCase) ||
                     block.Name.Equals("_NONE", StringComparison.OrdinalIgnoreCase))
-                    ext2 = style.DimLineExtend*style.DimScaleOverall;
+                {
+                    ext2 = style.DimLineExtend * style.DimScaleOverall;
+                }
             }
 
             start = Vector2.Polar(start, ext1, rotation);
@@ -217,12 +238,21 @@ namespace netDxf.Entities
 
         private static Arc DimensionArc(Vector2 center, Vector2 start, Vector2 end, double startAngle, double endAngle, double radius, DimensionStyle style, out double e1, out double e2)
         {
-            double ext1 = style.ArrowSize*style.DimScaleOverall;
-            double ext2 = -style.ArrowSize*style.DimScaleOverall;
+            double ext1 = style.ArrowSize * style.DimScaleOverall;
+            double ext2 = -style.ArrowSize * style.DimScaleOverall;
             e1 = ext1;
             e2 = ext2;
 
             Block block;
+
+            if (radius < 2 * ext1)
+            {
+                // the arc radius is too small to fit the arrowheads
+                ext1 = 0.0;
+                e1 = 0.0;
+                ext2 = 0.0;
+                e2 = 0.0;
+            }
 
             block = style.DimArrow1;
             if (block != null)
@@ -252,7 +282,7 @@ namespace netDxf.Entities
 
             start = Vector2.Polar(start, ext1, startAngle + MathHelper.HalfPI);
             end = Vector2.Polar(end, ext2, endAngle + MathHelper.HalfPI);
-            return new Arc(center, radius, Vector2.Angle(center, start)*MathHelper.RadToDeg, Vector2.Angle(center, end)*MathHelper.RadToDeg)
+            return new Arc(center, radius, Vector2.Angle(center, start) * MathHelper.RadToDeg, Vector2.Angle(center, end) * MathHelper.RadToDeg)
             {
                 Color = style.DimLineColor,
                 Linetype = style.DimLineLinetype,
@@ -302,10 +332,10 @@ namespace netDxf.Entities
 
             if (block == null)
             {
-                Vector2 arrowRef = Vector2.Polar(position, -style.ArrowSize*style.DimScaleOverall, rotation);
+                Vector2 arrowRef = Vector2.Polar(position, -style.ArrowSize * style.DimScaleOverall, rotation);
                 Solid arrow = new Solid(position,
-                    Vector2.Polar(arrowRef, -(style.ArrowSize/6)*style.DimScaleOverall, rotation + MathHelper.HalfPI),
-                    Vector2.Polar(arrowRef, (style.ArrowSize/6)*style.DimScaleOverall, rotation + MathHelper.HalfPI))
+                    Vector2.Polar(arrowRef, -(style.ArrowSize / 6) * style.DimScaleOverall, rotation + MathHelper.HalfPI),
+                    Vector2.Polar(arrowRef, (style.ArrowSize / 6) * style.DimScaleOverall, rotation + MathHelper.HalfPI))
                 {
                     Color = style.DimLineColor
                 };
@@ -316,8 +346,8 @@ namespace netDxf.Entities
                 Insert arrow = new Insert(block, position)
                 {
                     Color = style.DimLineColor,
-                    Scale = new Vector3(style.ArrowSize*style.DimScaleOverall),
-                    Rotation = rotation*MathHelper.RadToDeg,
+                    Scale = new Vector3(style.ArrowSize * style.DimScaleOverall),
+                    Rotation = rotation * MathHelper.RadToDeg,
                     Lineweight = style.DimLineLineweight
                 };
                 return arrow;
@@ -332,8 +362,8 @@ namespace netDxf.Entities
             {
                 Vector2 arrowRef = Vector2.Polar(position, -style.ArrowSize*style.DimScaleOverall, rotation);
                 Solid arrow = new Solid(position,
-                    Vector2.Polar(arrowRef, -(style.ArrowSize/6)*style.DimScaleOverall, rotation + MathHelper.HalfPI),
-                    Vector2.Polar(arrowRef, (style.ArrowSize/6)*style.DimScaleOverall, rotation + MathHelper.HalfPI))
+                    Vector2.Polar(arrowRef, -(style.ArrowSize / 6) * style.DimScaleOverall, rotation + MathHelper.HalfPI),
+                    Vector2.Polar(arrowRef, (style.ArrowSize / 6) * style.DimScaleOverall, rotation + MathHelper.HalfPI))
                 {
                     Color = style.DimLineColor
                 };
@@ -344,8 +374,8 @@ namespace netDxf.Entities
                 Insert arrow = new Insert(block, position)
                 {
                     Color = style.DimLineColor,
-                    Scale = new Vector3(style.ArrowSize*style.DimScaleOverall),
-                    Rotation = rotation*MathHelper.RadToDeg,
+                    Scale = new Vector3(style.ArrowSize * style.DimScaleOverall),
+                    Rotation = rotation * MathHelper.RadToDeg,
                     Lineweight = style.DimLineLineweight
                 };
                 return arrow;
@@ -355,13 +385,15 @@ namespace netDxf.Entities
         private static MText DimensionText(Vector2 position, MTextAttachmentPoint attachmentPoint, double rotation, string text, DimensionStyle style)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return null;
+            }
 
-            MText mText = new MText(text, position, style.TextHeight*style.DimScaleOverall, 0.0, style.TextStyle)
+            MText mText = new MText(text, position, style.TextHeight * style.DimScaleOverall, 0.0, style.TextStyle)
             {
                 Color = style.TextColor,
                 AttachmentPoint = attachmentPoint,
-                Rotation = rotation*MathHelper.RadToDeg
+                Rotation = rotation * MathHelper.RadToDeg
             };
 
             return mText;
@@ -371,7 +403,9 @@ namespace netDxf.Entities
         {
             List<EntityObject> lines = new List<EntityObject>();
             if (MathHelper.IsZero(style.CenterMarkSize))
+            {
                 return lines;
+            }
 
             Vector2 c1;
             Vector2 c2;
@@ -411,7 +445,9 @@ namespace netDxf.Entities
         {
             // to avoid the cloning, return the actual dimension style if there are no overrides
             if (dim.StyleOverrides.Count == 0)
+            {
                 return dim.Style;
+            }
 
             // make a shallow copy of the actual dimension style, there is no need of the full copy that the Clone method does
             DimensionStyle copy = new DimensionStyle(dim.Style.Name)
@@ -660,6 +696,9 @@ namespace netDxf.Entities
                 case DimensionType.Ordinate:
                     block = Build((OrdinateDimension)dim, name);
                     break;
+                case DimensionType.ArcLength:
+                    block = Build((ArcLengthDimension)dim, name);
+                    break;
                 default:
                     block = null;
                     break;
@@ -689,9 +728,10 @@ namespace netDxf.Entities
 
             Vector2 ref1 = dim.FirstReferencePoint;
             Vector2 ref2 = dim.SecondReferencePoint;
-            Vector2 vec = Vector2.Normalize(dim.DimLinePosition - ref2);
-            Vector2 dimRef1 = ref1 + dim.Offset*vec;
-            Vector2 dimRef2 = dim.DimLinePosition;
+            Vector2 vec = Vector2.Normalize(Vector2.Perpendicular(ref2 - ref1));
+            //Vector2 vec = Vector2.Normalize(dim.DimLinePosition - ref2);
+            Vector2 dimRef1 = ref1 + dim.Offset * vec;
+            Vector2 dimRef2 = ref2 + dim.Offset * vec; //dim.DimLinePosition;
 
             double refAngle = Vector2.Angle(ref1, ref2);
 
@@ -709,16 +749,21 @@ namespace netDxf.Entities
             }
 
             // extension lines
-            double dimexo = style.ExtLineOffset * style.DimScaleOverall;
-            double dimexe = style.ExtLineExtend * style.DimScaleOverall;
+            double dimexo = Math.Sign(dim.Offset) * style.ExtLineOffset * style.DimScaleOverall;
+            double dimexe = Math.Sign(dim.Offset) * style.ExtLineExtend * style.DimScaleOverall;
             if (!style.ExtLine1Off)
+            {
                 entities.Add(ExtensionLine(ref1 + dimexo * vec, dimRef1 + dimexe * vec, style, style.ExtLine1Linetype));
+            }
+
             if (!style.ExtLine2Off)
+            {
                 entities.Add(ExtensionLine(ref2 + dimexo * vec, dimRef2 + dimexe * vec, style, style.ExtLine2Linetype));
+            }
 
             // dimension text
             Vector2 textRef = Vector2.MidPoint(dimRef1, dimRef2);
-            double gap = style.TextOffset*style.DimScaleOverall;
+            double gap = style.TextOffset * style.DimScaleOverall;
             double textRot = refAngle;
             if (textRot > MathHelper.HalfPI && textRot <= MathHelper.ThreeHalfPI)
             {
@@ -728,9 +773,11 @@ namespace netDxf.Entities
 
             List<string> texts = FormatDimensionText(measure, dim.DimensionType, dim.UserText, style, dim.Owner);
 
-            MText mText = DimensionText(textRef + gap*vec, MTextAttachmentPoint.BottomCenter, textRot, texts[0], style);
+            MText mText = DimensionText(textRef + gap * vec, MTextAttachmentPoint.BottomCenter, textRot, texts[0], style);
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             // there might be an additional text if the code \X has been used in the dimension UserText 
             // this additional text appears under the dimension line
@@ -738,10 +785,12 @@ namespace netDxf.Entities
             {
                 MText mText2 = DimensionText(textRef - gap * vec, MTextAttachmentPoint.TopCenter, textRot, texts[1], style);
                 if (mText2 != null)
+                {
                     entities.Add(mText2);
+                }
             }
 
-            dim.TextReferencePoint = textRef + gap*vec;
+            dim.TextReferencePoint = textRef + gap * vec;
             dim.TextPositionManuallySet = false;
 
             // drawing block
@@ -766,12 +815,18 @@ namespace netDxf.Entities
             List<EntityObject> entities = new List<EntityObject>();
 
             double measure = dim.Measurement;
-            double dimRotation = dim.Rotation*MathHelper.DegToRad;
+            double dimRotation = dim.Rotation * MathHelper.DegToRad;
 
             Vector2 ref1 = dim.FirstReferencePoint;
             Vector2 ref2 = dim.SecondReferencePoint;
 
             Vector2 vec = Vector2.Normalize(Vector2.Rotate(Vector2.UnitY, dimRotation));
+            double cross = Vector2.CrossProduct(ref2 - ref1, vec);
+            if (cross < 0)
+            {
+                (ref1, ref2) = (ref2, ref1);
+            }
+
             Vector2 dimRef1 = dim.DimLinePosition + measure * Vector2.Perpendicular(vec);
             Vector2 dimRef2 = dim.DimLinePosition;
 
@@ -792,12 +847,17 @@ namespace netDxf.Entities
             // extension lines
             Vector2 dirRef1 = Vector2.Normalize(dimRef1 - ref1);
             Vector2 dirRef2 = Vector2.Normalize(dimRef2 - ref2);
-            double dimexo = style.ExtLineOffset*style.DimScaleOverall;
-            double dimexe = style.ExtLineExtend*style.DimScaleOverall;
+            double dimexo = style.ExtLineOffset * style.DimScaleOverall;
+            double dimexe = style.ExtLineExtend * style.DimScaleOverall;
             if (!style.ExtLine1Off)
-                entities.Add(ExtensionLine(ref1 + dimexo*dirRef1, dimRef1 + dimexe*dirRef1, style, style.ExtLine1Linetype));
+            {
+                entities.Add(ExtensionLine(ref1 + dimexo * dirRef1, dimRef1 + dimexe * dirRef1, style, style.ExtLine1Linetype));
+            }
+
             if (!style.ExtLine2Off)
-                entities.Add(ExtensionLine(ref2 + dimexo*dirRef2, dimRef2 + dimexe*dirRef2, style, style.ExtLine2Linetype));
+            {
+                entities.Add(ExtensionLine(ref2 + dimexo * dirRef2, dimRef2 + dimexe * dirRef2, style, style.ExtLine2Linetype));
+            }
 
             // dimension text
             Vector2 textRef = Vector2.MidPoint(dimRef1, dimRef2);
@@ -814,7 +874,9 @@ namespace netDxf.Entities
             //MText mText = DimensionText(Vector2.Polar(textRef, (style.TextOffset + style.TextHeight*0.5) * style.DimScaleOverall, textRot + MathHelper.HalfPI), MTextAttachmentPoint.MiddleCenter, textRot, texts[0], style);
 
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             // there might be an additional text if the code \X has been used in the dimension UserText 
             // this additional text appears under the dimension line
@@ -822,7 +884,9 @@ namespace netDxf.Entities
             {
                 MText mText2 = DimensionText(textRef - gap * vec, MTextAttachmentPoint.TopCenter, textRot, texts[1], style);
                 if (mText2 != null)
+                {
                     entities.Add(mText2);
+                }
             }
 
             dim.TextReferencePoint = textRef + gap * vec;
@@ -846,7 +910,7 @@ namespace netDxf.Entities
         /// </remarks>
         public static Block Build(Angular2LineDimension dim, string name)
         {
-            double offset = dim.Offset;
+            double offset = MathHelper.IsZero(dim.Offset) ? MathHelper.Epsilon : dim.Offset;
             double measure = dim.Measurement;
             DimensionStyle style = BuildDimensionStyleOverride(dim);
             List<EntityObject> entities = new List<EntityObject>();
@@ -860,11 +924,11 @@ namespace netDxf.Entities
             double startAngle = Vector2.Angle(ref1Start, ref1End);
             double endAngle = Vector2.Angle(ref2Start, ref2End);
 
-            double midRot = startAngle + measure*MathHelper.DegToRad*0.5;
+            double midRot = startAngle + measure * MathHelper.DegToRad * 0.5;
 
             Vector2 dimRef1 = Vector2.Polar(center, offset, startAngle);
             Vector2 dimRef2 = Vector2.Polar(center, offset, endAngle);
-            Vector2 midDim = Vector2.Polar(center, offset, midRot);
+            Vector2 midDim = dim.ArcDefinitionPoint; // Vector2.Polar(center, offset, midRot);
 
             // reference points
             Layer defPoints = new Layer("Defpoints") {Plot = false};
@@ -876,12 +940,14 @@ namespace netDxf.Entities
             // dimension lines
             if (!style.DimLine1Off && !style.DimLine2Off)
             {
-                double ext1;
-                double ext2;
-                entities.Add(DimensionArc(center, dimRef1, dimRef2, startAngle, endAngle, offset, style, out ext1, out ext2));
+                Arc arc = DimensionArc(center, dimRef1, dimRef2, startAngle, endAngle, offset, style, out double ext1, out double ext2);
+                if (!MathHelper.IsZero(measure))
+                {
+                    entities.Add(arc);
+                }
 
-                double angle1 = Math.Asin(ext1*0.5/offset);
-                double angle2 = Math.Asin(ext2*0.5/offset);
+                double angle1 = Math.Asin(ext1 * 0.5 / offset);
+                double angle2 = Math.Asin(ext2 * 0.5 / offset);
                 entities.Add(StartArrowHead(dimRef1, angle1 + startAngle - MathHelper.HalfPI, style));
                 entities.Add(EndArrowHead(dimRef2, angle2 + endAngle + MathHelper.HalfPI, style));
             }
@@ -932,7 +998,9 @@ namespace netDxf.Entities
             }
             MText mText = DimensionText(position, attachmentPoint, textRot, dimText, style);
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             dim.TextReferencePoint = position;
             dim.TextPositionManuallySet = false;
@@ -955,7 +1023,7 @@ namespace netDxf.Entities
         /// </remarks>
         public static Block Build(Angular3PointDimension dim, string name)
         {
-            double offset = dim.Offset;
+            double offset = MathHelper.IsZero(dim.Offset) ? MathHelper.Epsilon : Math.Abs(dim.Offset);
             double measure = dim.Measurement;
             DimensionStyle style = BuildDimensionStyleOverride(dim);
             List<EntityObject> entities = new List<EntityObject>();
@@ -964,12 +1032,17 @@ namespace netDxf.Entities
             Vector2 ref1 = dim.StartPoint;
             Vector2 ref2 = dim.EndPoint;
 
+            if (dim.Offset < 0)
+            {
+                (ref1, ref2) = (ref2, ref1);
+            }
+
             double startAngle = Vector2.Angle(refCenter, ref1);
             double endAngle = Vector2.Angle(refCenter, ref2);
-            double midRot = startAngle + measure*MathHelper.DegToRad*0.5;
+            double midRot = startAngle + 0.5 * measure * MathHelper.DegToRad;
             Vector2 dimRef1 = Vector2.Polar(refCenter, offset, startAngle);
             Vector2 dimRef2 = Vector2.Polar(refCenter, offset, endAngle);
-            Vector2 midDim = Vector2.Polar(refCenter, offset, midRot);
+            Vector2 midDim = dim.ArcDefinitionPoint;
 
             // reference points
             Layer defPoints = new Layer("Defpoints") {Plot = false};
@@ -980,12 +1053,15 @@ namespace netDxf.Entities
             // dimension lines
             if (!style.DimLine1Off && !style.DimLine2Off)
             {
-                double ext1;
-                double ext2;
-                entities.Add(DimensionArc(refCenter, dimRef1, dimRef2, startAngle, endAngle, offset, style, out ext1, out ext2));
+                Arc arc = DimensionArc(refCenter, dimRef1, dimRef2, startAngle, endAngle, offset, style, out double ext1, out double ext2);
+                if (!MathHelper.IsZero(measure))
+                {
+                    entities.Add(arc);
+                }
 
-                double angle1 = Math.Asin(ext1*0.5/offset);
-                double angle2 = Math.Asin(ext2*0.5/offset);
+                //entities.Add(DimensionArc(refCenter, dimRef1, dimRef2, startAngle, endAngle, offset, style, out double ext1, out double ext2));
+                double angle1 = Math.Asin(ext1 * 0.5 / offset);
+                double angle2 = Math.Asin(ext2 * 0.5 / offset);
                 entities.Add(StartArrowHead(dimRef1, angle1 + startAngle - MathHelper.HalfPI, style));
                 entities.Add(EndArrowHead(dimRef2, angle2 + endAngle + MathHelper.HalfPI, style));
             }
@@ -993,17 +1069,25 @@ namespace netDxf.Entities
             // extension lines
             double refAngle = 0.0;
             if (Vector2.Distance(refCenter, ref1) > Vector2.Distance(refCenter, dimRef1))
+            {
                 refAngle = MathHelper.PI;
-            double dimexo = style.ExtLineOffset*style.DimScaleOverall;
-            double dimexe = style.ExtLineExtend*style.DimScaleOverall;
+            }
+
+            double dimexo = style.ExtLineOffset * style.DimScaleOverall;
+            double dimexe = style.ExtLineExtend * style.DimScaleOverall;
             if (!style.ExtLine1Off)
+            {
                 entities.Add(ExtensionLine(Vector2.Polar(ref1, dimexo, startAngle + refAngle), Vector2.Polar(dimRef1, dimexe, startAngle + refAngle), style, style.ExtLine1Linetype));
+            }
+
             if (!style.ExtLine2Off)
+            {
                 entities.Add(ExtensionLine(Vector2.Polar(ref2, dimexo, endAngle + refAngle), Vector2.Polar(dimRef2, dimexe, endAngle + refAngle), style, style.ExtLine1Linetype));
+            }
 
             // dimension text
             double textRot = midRot - MathHelper.HalfPI;
-            double gap = style.TextOffset*style.DimScaleOverall;
+            double gap = style.TextOffset * style.DimScaleOverall;
             if (textRot > MathHelper.HalfPI && textRot <= MathHelper.ThreeHalfPI)
             {
                 textRot += MathHelper.PI;
@@ -1028,13 +1112,15 @@ namespace netDxf.Entities
             }
             MText mText = DimensionText(position, attachmentPoint, textRot, dimText, style);
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             dim.TextReferencePoint = position;
             dim.TextPositionManuallySet = false;
 
             // drawing block
-            return new Block(name, entities, null, false);
+            return new Block(name, entities, null, false) { Flags = BlockTypeFlags.AnonymousBlock };
         }
 
         /// <summary>
@@ -1117,15 +1203,21 @@ namespace netDxf.Entities
 
             // center cross
             if (!MathHelper.IsZero(style.CenterMarkSize))
+            {
                 entities.AddRange(CenterCross(centerRef, radius, style));
+            }
 
             // dimension text
             List<string> texts = FormatDimensionText(measure, dim.DimensionType, dim.UserText, style, dim.Owner);
             string dimText ;
             if (texts.Count > 1)
+            {
                 dimText = texts[0] + "\\P" + texts[1];
+            }
             else
+            {
                 dimText = texts[0];
+            }
 
             double textRot = angleRef;
             short reverse = 1;
@@ -1139,12 +1231,14 @@ namespace netDxf.Entities
             MTextAttachmentPoint attachmentPoint = reverse*inside < 0 ? MTextAttachmentPoint.MiddleLeft : MTextAttachmentPoint.MiddleRight;
             MText mText = DimensionText(textPos, attachmentPoint, textRot, dimText, style);
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             dim.TextReferencePoint = textPos;
             dim.TextPositionManuallySet = false;
 
-            return new Block(name, entities, null, false);
+            return new Block(name, entities, null, false) {Flags = BlockTypeFlags.AnonymousBlock};
         }
 
         /// <summary>
@@ -1228,9 +1322,13 @@ namespace netDxf.Entities
             List<string> texts = FormatDimensionText(radius, dim.DimensionType, dim.UserText, style, dim.Owner);
             string dimText;
             if (texts.Count > 1)
+            {
                 dimText = texts[0] + "\\P" + texts[1];
+            }
             else
+            {
                 dimText = texts[0];
+            }
 
             double textRot = angleRef;
             short reverse = 1;
@@ -1240,16 +1338,18 @@ namespace netDxf.Entities
                 reverse = -1;
             }
 
-            Vector2 textPos = Vector2.Polar(dimRef, -reverse*side*style.TextOffset*style.DimScaleOverall, textRot);
+            Vector2 textPos = Vector2.Polar(dimRef, -reverse * side * style.TextOffset * style.DimScaleOverall, textRot);
             MTextAttachmentPoint attachmentPoint = reverse * side < 0 ? MTextAttachmentPoint.MiddleLeft : MTextAttachmentPoint.MiddleRight;
             MText mText = DimensionText(textPos, attachmentPoint, textRot, dimText, style);
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             dim.TextReferencePoint = textPos;
             dim.TextPositionManuallySet = false;
 
-            return new Block(name, entities, null, false);
+            return new Block(name, entities, null, false) {Flags = BlockTypeFlags.AnonymousBlock};
 
         }
 
@@ -1281,7 +1381,9 @@ namespace netDxf.Entities
             int side = 1;
 
             if (dim.Axis == OrdinateDimensionAxis.X)
+            {
                 rotation += MathHelper.HalfPI;
+            }
 
             Vector2 ocsDimRef = Vector2.Rotate(refDim, -rotation);
 
@@ -1327,26 +1429,256 @@ namespace netDxf.Entities
             entities.Add(new Line(pto2, ref2));
 
             // dimension text
-
             Vector2 midText = Vector2.Polar(ref2, side*style.TextOffset*style.DimScaleOverall, rotation);
 
             List<string> texts = FormatDimensionText(measure, dim.DimensionType, dim.UserText, style, dim.Owner);
             string dimText;
             if (texts.Count > 1)
+            {
                 dimText = texts[0] + "\\P" + texts[1];
+            }
             else
+            {
                 dimText = texts[0];
+            }
 
             MTextAttachmentPoint attachmentPoint = side < 0 ? MTextAttachmentPoint.MiddleRight : MTextAttachmentPoint.MiddleLeft;
             MText mText = DimensionText(midText, attachmentPoint, rotation, dimText, style);
             if (mText != null)
+            {
                 entities.Add(mText);
+            }
 
             dim.TextReferencePoint = midText;
             dim.TextPositionManuallySet = false;
 
             // drawing block
-            return new Block(name, entities, null, false);
+            return new Block(name, entities, null, false) {Flags = BlockTypeFlags.AnonymousBlock};
+        }
+
+        /// <summary>
+        /// Creates a block that represents the drawing of the specified dimension.
+        /// </summary>
+        /// <param name="dim"><see cref="ArcLengthDimension">ArcLengthDimension</see> from which the block will be created.</param>
+        /// <param name="name">The blocks name.</param>
+        /// <returns>A block that represents the specified dimension.</returns>
+        /// <remarks>
+        /// The block's name is irrelevant when the dimension belongs to a document,
+        /// it will be automatically renamed to accommodate to the nomenclature of the DXF.<br />
+        /// The dimension block creation only supports a limited number of <see cref="DimensionStyle">dimension style</see> properties.
+        /// Also the list of <see cref="DimensionStyleOverride">dimension style overrides</see> associated with the specified dimension will be applied where necessary.
+        /// </remarks>
+        public static Block Build(ArcLengthDimension dim, string name)
+        {
+            double offset = MathHelper.IsZero(dim.Offset) ? MathHelper.Epsilon : Math.Abs(dim.Offset);
+            double arcAngle = dim.ArcAngle;
+            double measure = dim.Measurement;
+            DimensionStyle style = BuildDimensionStyleOverride(dim);
+            List<EntityObject> entities = new List<EntityObject>();
+
+            Vector2 refCenter = dim.CenterPoint;
+            Vector2 ref1 =  Vector2.Polar(dim.CenterPoint, dim.Radius, dim.StartAngle * MathHelper.DegToRad);
+            Vector2 ref2 = Vector2.Polar(dim.CenterPoint, dim.Radius, dim.EndAngle * MathHelper.DegToRad);
+
+            if (dim.Offset < 0)
+            {
+                (ref1, ref2) = (ref2, ref1);
+            }
+
+            double startAngle = Vector2.Angle(refCenter, ref1);
+            double endAngle = Vector2.Angle(refCenter, ref2);
+            double midRot = startAngle + 0.5 * arcAngle * MathHelper.DegToRad;
+            Vector2 dimRef1 = Vector2.Polar(refCenter, offset, startAngle);
+            Vector2 dimRef2 = Vector2.Polar(refCenter, offset, endAngle);
+            Vector2 midDim = dim.ArcDefinitionPoint;
+
+            // reference points
+            Layer defPoints = new Layer("Defpoints") {Plot = false};
+            entities.Add(new Point(ref1) {Layer = defPoints});
+            entities.Add(new Point(ref2) {Layer = defPoints});
+            entities.Add(new Point(refCenter) {Layer = defPoints});
+
+            // dimension lines
+            if (!style.DimLine1Off && !style.DimLine2Off)
+            {
+                Arc arc = DimensionArc(refCenter, dimRef1, dimRef2, startAngle, endAngle, offset, style, out double ext1, out double ext2);
+                if (!MathHelper.IsZero(arcAngle))
+                {
+                    entities.Add(arc);
+                }
+
+                //entities.Add(DimensionArc(refCenter, dimRef1, dimRef2, startAngle, endAngle, offset, style, out double ext1, out double ext2));
+                double angle1 = Math.Asin(ext1 * 0.5 / offset);
+                double angle2 = Math.Asin(ext2 * 0.5 / offset);
+                entities.Add(StartArrowHead(dimRef1, angle1 + startAngle - MathHelper.HalfPI, style));
+                entities.Add(EndArrowHead(dimRef2, angle2 + endAngle + MathHelper.HalfPI, style));
+            }
+                
+            // extension lines
+            double refAngle = 0.0;
+            if (Vector2.Distance(refCenter, ref1) > Vector2.Distance(refCenter, dimRef1))
+            {
+                refAngle = MathHelper.PI;
+            }
+
+            double dimexo = style.ExtLineOffset * style.DimScaleOverall;
+            double dimexe = style.ExtLineExtend * style.DimScaleOverall;
+            if (!style.ExtLine1Off)
+            {
+                entities.Add(ExtensionLine(Vector2.Polar(ref1, dimexo, startAngle + refAngle), Vector2.Polar(dimRef1, dimexe, startAngle + refAngle), style, style.ExtLine1Linetype));
+            }
+
+            if (!style.ExtLine2Off)
+            {
+                entities.Add(ExtensionLine(Vector2.Polar(ref2, dimexo, endAngle + refAngle), Vector2.Polar(dimRef2, dimexe, endAngle + refAngle), style, style.ExtLine1Linetype));
+            }
+
+            // dimension text
+            double textRot = midRot - MathHelper.HalfPI;
+            double gap = style.TextOffset * style.DimScaleOverall;
+            if (textRot > MathHelper.HalfPI && textRot <= MathHelper.ThreeHalfPI)
+            {
+                textRot += MathHelper.PI;
+                gap *= -1;
+            }
+
+            List<string> texts = FormatDimensionText(measure, dim.DimensionType, dim.UserText, style, dim.Owner);
+            string dimText;
+            Vector2 position;
+            MTextAttachmentPoint attachmentPoint;
+            if (texts.Count > 1)
+            {
+                position = midDim;
+                dimText = texts[0] + "\\P" + texts[1];
+                attachmentPoint = MTextAttachmentPoint.MiddleCenter;
+            }
+            else
+            {
+                position = Vector2.Polar(midDim, gap, midRot);
+                dimText = texts[0];
+                attachmentPoint = MTextAttachmentPoint.BottomCenter;
+            }
+            MText mText = DimensionText(position, attachmentPoint, textRot, dimText, style);
+            if (mText != null)
+            {
+                entities.Add(mText);
+            }
+
+            dim.TextReferencePoint = position;
+            dim.TextPositionManuallySet = false;
+
+            // drawing block
+            return new Block(name, entities, null, false) { Flags = BlockTypeFlags.AnonymousBlock };
+
+
+            //double offset = dim.Radius + dim.Offset;
+            //if (MathHelper.IsZero(offset))
+            //{
+            //    offset = MathHelper.Epsilon;
+            //}
+
+            //double measure = dim.Measurement;
+            //DimensionStyle style = BuildDimensionStyleOverride(dim);
+            //List<EntityObject> entities = new List<EntityObject>();
+
+            //Vector2 refCenter = dim.CenterPoint;
+            //Vector2 ref1 =  Vector2.Polar(dim.CenterPoint, dim.Radius, dim.StartAngle * MathHelper.DegToRad);
+            //Vector2 ref2 = Vector2.Polar(dim.CenterPoint, dim.Radius, dim.EndAngle * MathHelper.DegToRad);
+
+            //double midRot = (dim.StartAngle + dim.ArcAngle * 0.5) * MathHelper.DegToRad;
+
+            //double startAngle;
+            //double endAngle;
+            //if (MathHelper.IsZero(dim.Radius))
+            //{
+            //    startAngle = MathHelper.HalfPI;
+            //    endAngle = MathHelper.HalfPI;
+            //}
+            //else
+            //{
+            //    startAngle = dim.StartAngle * MathHelper.DegToRad;
+            //    endAngle = dim.EndAngle * MathHelper.DegToRad;
+            //}
+            //Vector2 dimRef1 = Vector2.Polar(refCenter, offset, startAngle);
+            //Vector2 dimRef2 = Vector2.Polar(refCenter, offset, endAngle);
+            //Vector2 midDim = Vector2.Polar(refCenter, offset, midRot);
+
+            //// reference points
+            //Layer defPoints = new Layer("Defpoints") {Plot = false};
+            //entities.Add(new Point(ref1) {Layer = defPoints});
+            //entities.Add(new Point(ref2) {Layer = defPoints});
+            //entities.Add(new Point(refCenter) {Layer = defPoints});
+
+            //// dimension lines
+            //if (!style.DimLine1Off && !style.DimLine2Off)
+            //{
+            //    Arc arc = DimensionArc(refCenter, dimRef1, dimRef2, startAngle, endAngle, Math.Abs(offset), style, out double ext1, out double ext2);
+            //    if (!MathHelper.IsZero(measure))
+            //    {
+            //        entities.Add(arc);
+            //    }
+
+            //    double angle1 = Math.Asin(ext1 * 0.5 / offset);
+            //    double angle2 = Math.Asin(ext2 * 0.5 / offset);
+            //    entities.Add(StartArrowHead(dimRef1, angle1 + startAngle - MathHelper.HalfPI, style));
+            //    entities.Add(EndArrowHead(dimRef2, angle2 + endAngle + MathHelper.HalfPI, style));
+            //}
+                
+            //// extension lines
+            //double refAngle = 0.0;
+            //if (Vector2.Distance(refCenter, ref1) > Vector2.Distance(refCenter, dimRef1))
+            //{
+            //    refAngle = MathHelper.PI;
+            //}
+
+            //double dimexo = style.ExtLineOffset * style.DimScaleOverall;
+            //double dimexe = style.ExtLineExtend * style.DimScaleOverall;
+            //if (!style.ExtLine1Off)
+            //{
+            //    entities.Add(ExtensionLine(Vector2.Polar(ref1, dimexo, startAngle + refAngle), Vector2.Polar(dimRef1, dimexe, startAngle + refAngle), style, style.ExtLine1Linetype));
+            //}
+
+            //if (!style.ExtLine2Off)
+            //{
+            //    entities.Add(ExtensionLine(Vector2.Polar(ref2, dimexo, endAngle + refAngle), Vector2.Polar(dimRef2, dimexe, endAngle + refAngle), style, style.ExtLine1Linetype));
+            //}
+
+            //// dimension text
+            //double textRot = midRot - MathHelper.HalfPI;
+            //double gap = style.TextOffset * style.DimScaleOverall;
+            //if (textRot > MathHelper.HalfPI && textRot <= MathHelper.ThreeHalfPI)
+            //{
+            //    textRot += MathHelper.PI;
+            //    gap *= -1;
+            //}
+
+            //List<string> texts = FormatDimensionText(measure, dim.DimensionType, dim.UserText, style, dim.Owner);
+            //string dimText;
+            //Vector2 position;
+            //MTextAttachmentPoint attachmentPoint;
+            //if (texts.Count > 1)
+            //{
+            //    position = midDim;
+            //    dimText = texts[0] + "\\P" + texts[1];
+            //    attachmentPoint = MTextAttachmentPoint.MiddleCenter;
+            //}
+            //else
+            //{
+            //    position = Vector2.Polar(midDim, gap, midRot);
+            //    dimText = texts[0];
+            //    attachmentPoint = MTextAttachmentPoint.BottomCenter;
+            //}
+            //MText mText = DimensionText(position, attachmentPoint, textRot, dimText, style);
+            //if (mText != null)
+            //{
+            //    entities.Add(mText);
+            //}
+
+            //dim.TextReferencePoint = position;
+            //dim.TextPositionManuallySet = false;
+
+            //// drawing block
+            //return new Block(name, entities, null, false) {Flags = BlockTypeFlags.AnonymousBlock};
         }
 
         #endregion

@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -38,7 +41,7 @@ namespace netDxf
         #region private fields
 
         private readonly ClippingBoundaryType type;
-        private readonly IList<Vector2> vertexes;
+        private readonly IReadOnlyList<Vector2> vertexes;
 
         #endregion
 
@@ -77,7 +80,9 @@ namespace netDxf
             this.type = ClippingBoundaryType.Polygonal;
             this.vertexes = new List<Vector2>(vertexes);
             if (this.vertexes.Count < 3)
-                throw new ArgumentOutOfRangeException("vertexes", this.vertexes.Count, "The number of vertexes for the polygonal clipping boundary must be equal or greater than three.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(vertexes), this.vertexes.Count, "The number of vertexes for the polygonal clipping boundary must be equal or greater than three.");
+            }
         }
 
         #endregion
@@ -95,7 +100,7 @@ namespace netDxf
         /// <summary>
         /// Gets the list of vertexes of the polygonal boundary, or the opposite vertexes if the boundary is rectangular.
         /// </summary>
-        public IList<Vector2> Vertexes
+        public IReadOnlyList<Vector2> Vertexes
         {
             get { return this.vertexes; }
         }
@@ -110,7 +115,9 @@ namespace netDxf
         /// <returns>A new ClippingBoundary that is a copy of this instance.</returns>
         public object Clone()
         {
-            return this.type == ClippingBoundaryType.Rectangular ? new ClippingBoundary(this.vertexes[0], this.vertexes[1]) : new ClippingBoundary(this.vertexes);
+            return this.type == ClippingBoundaryType.Rectangular
+                ? new ClippingBoundary(this.vertexes[0], this.vertexes[1])
+                : new ClippingBoundary(this.vertexes);
         }
 
         #endregion

@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -35,9 +38,7 @@ namespace netDxf.Objects
         #region delegates and events
 
         public delegate void LinetypeChangedEventHandler(MLineStyleElement sender, TableObjectChangedEventArgs<Linetype> e);
-
         public event LinetypeChangedEventHandler LinetypeChanged;
-
         protected virtual Linetype OnLinetypeChangedEvent(Linetype oldLinetype, Linetype newLinetype)
         {
             LinetypeChangedEventHandler ae = this.LinetypeChanged;
@@ -101,16 +102,14 @@ namespace netDxf.Objects
         /// Gets or sets the element color.
         /// </summary>
         /// <remarks>
-        /// AutoCad2000 dxf version does not support true colors for MLineStyleElement color.
+        /// AutoCad2000 DXF version does not support true colors for MLineStyleElement color.
         /// </remarks>
         public AciColor Color
         {
             get { return this.color; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-                this.color = value;
+                this.color = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -123,7 +122,9 @@ namespace netDxf.Objects
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -137,6 +138,7 @@ namespace netDxf.Objects
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>
+        /// The MLineStyleElements are ordered from larger to smaller offset values.
         /// A 32-bit signed integer that indicates the relative order of the objects being compared.
         /// The return value has the following meanings: Value Meaning Less than zero This object is less than the other parameter.
         /// Zero This object is equal to other. Greater than zero This object is greater than other.
@@ -144,9 +146,11 @@ namespace netDxf.Objects
         public int CompareTo(MLineStyleElement other)
         {
             if (other == null)
-                throw new ArgumentNullException("other");
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
 
-            return this.offset.CompareTo(other.offset);
+            return -this.offset.CompareTo(other.offset);
         }
 
         /// <summary>
@@ -160,10 +164,14 @@ namespace netDxf.Objects
         public override bool Equals(object other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             if (this.GetType() != other.GetType())
+            {
                 return false;
+            }
 
             return this.Equals((MLineStyleElement) other);
         }
@@ -179,7 +187,9 @@ namespace netDxf.Objects
         public bool Equals(MLineStyleElement other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return MathHelper.IsEqual(this.offset, other.offset);
         }
@@ -192,68 +202,6 @@ namespace netDxf.Objects
         {
             return this.Offset.GetHashCode();
         }
-
-        ///// <summary>
-        ///// Check if the two elements are equal.
-        ///// </summary>
-        ///// <param name="u">MLineStyleElement.</param>
-        ///// <param name="v">MLineStyleElement.</param>
-        ///// <returns>True if the two element offsets are equal, false in any other case.</returns>
-        //public static bool operator ==(MLineStyleElement u, MLineStyleElement v)
-        //{
-        //    if (ReferenceEquals(u, null) && ReferenceEquals(v, null))
-        //        return true;
-
-        //    if (ReferenceEquals(u, null) || ReferenceEquals(v, null))
-        //        return false;
-
-        //    return MathHelper.IsEqual(u.Offset, v.Offset);
-        //}
-
-        ///// <summary>
-        ///// Check if the elements are different.
-        ///// </summary>
-        ///// <param name="u">MLineStyleElement.</param>
-        ///// <param name="v">MLineStyleElement.</param>
-        ///// <returns>True if the two element offsets are different, false in any other case.</returns>
-        //public static bool operator !=(MLineStyleElement u, MLineStyleElement v)
-        //{
-        //    if (ReferenceEquals(u, null) && ReferenceEquals(v, null))
-        //        return false;
-
-        //    if (ReferenceEquals(u, null) || ReferenceEquals(v, null))
-        //        return true;
-
-        //    return !MathHelper.IsEqual(u.offset, v.offset);
-        //}
-
-        ///// <summary>
-        ///// Check if the first element is lesser than the second.
-        ///// </summary>
-        ///// <param name="u">MLineStyleElement.</param>
-        ///// <param name="v">MLineStyleElement.</param>
-        ///// <returns>True if the first element offset is lesser than the second, false in any other case.</returns>
-        //public static bool operator <(MLineStyleElement u, MLineStyleElement v)
-        //{
-        //    if (ReferenceEquals(u, null) || ReferenceEquals(v, null))
-        //        return false;
-
-        //    return u.offset.CompareTo(v.offset) < 0;
-        //}
-
-        ///// <summary>
-        ///// Check if the first element is greater than the second.
-        ///// </summary>
-        ///// <param name="u">MLineStyleElement.</param>
-        ///// <param name="v">MLineStyleElement.</param>
-        ///// <returns>True if the first element offset is greater than the second, false in any other case.</returns>
-        //public static bool operator >(MLineStyleElement u, MLineStyleElement v)
-        //{
-        //    if (ReferenceEquals(u, null) || ReferenceEquals(v, null))
-        //        return false;
-
-        //    return u.offset.CompareTo(v.offset) > 0;
-        //}
 
         #endregion
 

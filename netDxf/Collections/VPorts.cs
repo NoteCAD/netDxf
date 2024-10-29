@@ -1,27 +1,29 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
-using System.Collections.Generic;
 using netDxf.Tables;
 
 namespace netDxf.Collections
@@ -29,6 +31,9 @@ namespace netDxf.Collections
     /// <summary>
     /// Represents a collection of viewports.
     /// </summary>
+    /// <remarks>
+    /// Multiple Model viewports are not supported, there can be only one called "*Active".
+    /// </remarks>
     public sealed class VPorts :
         TableObjects<VPort>
     {
@@ -42,18 +47,13 @@ namespace netDxf.Collections
         internal VPorts(DxfDocument document, string handle)
             : base(document, DxfObjectCode.VportTable, handle)
         {
-            this.MaxCapacity = short.MaxValue;
-
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
-
             // add the current document viewport, it is always present
             VPort active = VPort.Active;
-            this.Owner.NumHandles = active.AsignHandle(this.Owner.NumHandles);
+            this.Owner.NumHandles = active.AssignHandle(this.Owner.NumHandles);
 
             this.Owner.AddedObjects.Add(active.Handle, active);
-            this.list.Add(active.Name, active);
-            this.references.Add(active.Name, new List<DxfObject>());
+            this.List.Add(active.Name, active);
+            this.References.Add(active.Name, new DxfObjectReferences());
             active.Owner = this;
         }
 
@@ -72,23 +72,7 @@ namespace netDxf.Collections
         /// </returns>
         internal override VPort Add(VPort vport, bool assignHandle)
         {
-            throw new ArgumentException("VPorts cannot be added to the collection. There is only one VPort in the list the \"*Active\".", "vport");
-
-            //if (this.list.Count >= this.maxCapacity)
-            //    throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.codeName, this.maxCapacity));
-
-            //VPort add;
-            //if (this.list.TryGetValue(vport.Name, out add))
-            //    return add;
-
-            //if (assignHandle || string.IsNullOrEmpty(vport.Handle))
-            //    this.document.NumHandles = vport.AsignHandle(this.document.NumHandles);
-
-            //this.list.Add(vport.Name, vport);
-            //this.references.Add(vport.Name, new List<DxfObject>());
-            //vport.Owner = this;
-            //this.document.AddedObjects.Add(vport.Handle, vport);
-            //return vport;
+            throw new ArgumentException("VPorts cannot be added to the collection. There is only one VPort in the list the \"*Active\".", nameof(vport));
         }
 
         /// <summary>
@@ -99,9 +83,7 @@ namespace netDxf.Collections
         /// <remarks>Reserved viewports or any other referenced by objects cannot be removed.</remarks>
         public override bool Remove(string name)
         {
-            throw new ArgumentException("VPorts cannot be removed from the collection.", "name");
-
-            //return this.Remove(this[name]);
+            throw new ArgumentException("VPorts cannot be removed from the collection.", nameof(name));
         }
 
         /// <summary>
@@ -112,26 +94,7 @@ namespace netDxf.Collections
         /// <remarks>Reserved viewports or any other referenced by objects cannot be removed.</remarks>
         public override bool Remove(VPort item)
         {
-            throw new ArgumentException("VPorts cannot be removed from the collection.", "item");
-
-            //if (vport == null)
-            //    return false;
-
-            //if (!this.Contains(vport))
-            //    return false;
-
-            //if (vport.IsReserved)
-            //    return false;
-
-            //if (this.references[vport.Name].Count != 0)
-            //    return false;
-
-            //vport.Owner = null;
-            //this.document.AddedObjects.Remove(vport.Handle);
-            //this.references.Remove(vport.Name);
-            //this.list.Remove(vport.Name);
-
-            //return true;
+            throw new ArgumentException("VPorts cannot be removed from the collection.", nameof(item));
         }
 
         #endregion

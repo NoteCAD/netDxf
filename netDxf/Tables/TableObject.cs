@@ -1,37 +1,39 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
-using netDxf.Collections;
+using System.Linq;
 
 namespace netDxf.Tables
 {
     /// <summary>
-    /// Defines classes that can be accessed by name. They are usually part of the dxf table section but can also be part of the objects section.
+    /// Defines classes that can be accessed by name. They are usually part of the DXF TABLE section but can also be part of the OBJECTS section.
     /// </summary>
     public abstract class TableObject :
         DxfObject,
-        IHasXData,
         ICloneable,
         IComparable,
         IComparable<TableObject>,
@@ -51,30 +53,13 @@ namespace netDxf.Tables
             }
         }
 
-        public event XDataAddAppRegEventHandler XDataAddAppReg;
-        protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
-        {
-            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
-            if (ae != null)
-                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
-        }
-
-        public event XDataRemoveAppRegEventHandler XDataRemoveAppReg;
-        protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
-        {
-            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
-            if (ae != null)
-                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
-        }
-
         #endregion
 
         #region private fields
 
-        private static readonly IList<string> invalidCharacters = new[] {"\\", "/", ":", "*", "?", "\"", "<", ">", "|", ";", ",", "=", "`"};
+        private static readonly char[] invalidCharacters = { '\\', '/', ':', '*', '?', '"', '<', '>', '|', ';', ',', '=', '`' };
         private bool reserved;
         private string name;
-        private readonly XDataDictionary xData;
 
         #endregion
 
@@ -89,17 +74,17 @@ namespace netDxf.Tables
         protected TableObject(string name, string codeName, bool checkName)
             : base(codeName)
         {
+            name = name.Trim();
             if (checkName)
             {
                 if (!IsValidName(name))
-                    throw new ArgumentException("The name should be at least one character long and the following characters \\<>/?\":;*|,=` are not supported.", "name");
+                {
+                    throw new ArgumentException("The name should be at least one character long and the following characters \\<>/?\":;*|,=` are not supported.", nameof(name));
+                }
             }
 
             this.name = name;
             this.reserved = false;
-            this.xData = new XDataDictionary();
-            this.xData.AddAppReg += this.XData_AddAppReg;
-            this.xData.RemoveAppReg += this.XData_RemoveAppReg;
         }
 
         #endregion
@@ -128,17 +113,9 @@ namespace netDxf.Tables
         /// <summary>
         /// Gets the array of characters not supported as table object names.
         /// </summary>
-        public static IList<string> InvalidCharacters
+        public static char[] InvalidCharacters
         {
-            get { return invalidCharacters; }
-        }
-
-        /// <summary>
-        /// Gets the table <see cref="XDataDictionary">extended data</see>.
-        /// </summary>
-        public XDataDictionary XData
-        {
-            get { return this.xData; }
+            get { return invalidCharacters.ToArray(); }
         }
 
         #endregion
@@ -153,40 +130,67 @@ namespace netDxf.Tables
         public static bool IsValidName(string name)
         {
             if (string.IsNullOrEmpty(name))
-                return false;
-
-            foreach (string s in InvalidCharacters)
             {
-                if (name.Contains(s))
-                    return false;
+                return false;
             }
 
-            // using regular expressions is slower
-            //if (Regex.IsMatch(name, "[\\<>/?\":;*|,=`]"))
-            //    throw new ArgumentException("The following characters \\<>/?\":;*|,=` are not supported for table object names.", "name");
-
-            return true;
+            return name.IndexOfAny(invalidCharacters) == -1;
         }
 
+        /// <summary>
+        /// Checks if this instance has been referenced by other DxfObjects. 
+        /// </summary>
+        /// <returns>
+        /// Returns true if this instance has been referenced by other DxfObjects, false otherwise.
+        /// It will always return false if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same value as the HasReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public abstract bool HasReferences();
+
+        /// <summary>
+        /// Gets the list of DxfObjects referenced by this instance.
+        /// </summary>
+        /// <returns>
+        /// A list of DxfObjectReference that contains the DxfObject referenced by this instance and the number of times it does.
+        /// It will return null if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same list as the GetReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public abstract List<DxfObjectReference> GetReferences();
+        
         #endregion
 
         #region internal methods
 
-        /// <summary>
-        /// Hack to change the table name without having to check its name. Some invalid characters are used for internal purposes only.
-        /// </summary>
-        /// <param name="newName">Table object new name.</param>
         internal void SetName(string newName, bool checkName)
         {
+            // Hack to change the table name without having to check its name.
+            // Some invalid characters are used for internal purposes only.
             if (string.IsNullOrEmpty(newName))
-                throw new ArgumentNullException("newName");
+            {
+                throw new ArgumentNullException(nameof(newName));
+            }
+
             if (this.IsReserved)
-                throw new ArgumentException("Reserved table objects cannot be renamed.", "newName");
+            {
+                throw new ArgumentException("Reserved table objects cannot be renamed.", nameof(newName));
+            }
+
             if (string.Equals(this.name, newName, StringComparison.OrdinalIgnoreCase))
+            {
                 return;
+            }
+
             if (checkName)
+            {
                 if (!IsValidName(newName))
-                    throw new ArgumentException("The following characters \\<>/?\":;*|,=` are not supported for table object names.", "newName");
+                {
+                    throw new ArgumentException("The following characters \\<>/?\":;*|,=` are not supported for table object names.", nameof(newName));
+                }
+            }
             this.OnNameChangedEvent(this.name, newName);
             this.name = newName;
         }
@@ -236,7 +240,9 @@ namespace netDxf.Tables
         public int CompareTo(TableObject other)
         {
             if (other == null)
-                throw new ArgumentNullException("other");
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
 
             return this.GetType() == other.GetType() ? string.Compare(this.Name, other.Name, StringComparison.OrdinalIgnoreCase) : 0;
         }
@@ -323,15 +329,19 @@ namespace netDxf.Tables
         /// <returns>True if two TableObject are equal or false in any other case.</returns>
         /// <remarks>
         /// Two TableObjects are considered equals if their names are the same, regardless of their internal values.
-        /// This is done this way because in a dxf two TableObjects cannot have the same name.
+        /// This is done this way because in a DXF two TableObjects cannot have the same name.
         /// </remarks>
         public override bool Equals(object other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             if (this.GetType() != other.GetType())
+            {
                 return false;
+            }
 
             return this.Equals((TableObject) other);
         }
@@ -343,12 +353,14 @@ namespace netDxf.Tables
         /// <returns>True if two TableObject are equal or false in any other case.</returns>
         /// <remarks>
         /// Two TableObjects are considered equals if their names are the same, regardless of their internal values.
-        /// This is done this way because in a dxf two TableObjects cannot have the same name.
+        /// This is done this way because in a DXF two TableObjects cannot have the same name.
         /// </remarks>
         public bool Equals(TableObject other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
         }
@@ -372,18 +384,5 @@ namespace netDxf.Tables
 
         #endregion
 
-        #region XData events
-
-        private void XData_AddAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
-        {
-            this.OnXDataAddAppRegEvent(e.Item);
-        }
-
-        private void XData_RemoveAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
-        {
-            this.OnXDataRemoveAppRegEvent(e.Item);
-        }
-
-        #endregion
     }
 }

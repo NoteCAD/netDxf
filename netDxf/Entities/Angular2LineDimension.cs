@@ -1,27 +1,31 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using netDxf.Blocks;
 using netDxf.Tables;
 
@@ -95,19 +99,27 @@ namespace netDxf.Entities
         /// <param name="firstLine">First <see cref="Line">line</see> that defines the angle to measure.</param>
         /// <param name="secondLine">Second <see cref="Line">line</see> that defines the angle to measure.</param>
         /// <param name="offset">Distance between the center point and the dimension line.</param>
+        /// <param name="normal">Normal vector of the plane where the dimension is defined.</param>
         /// <param name="style">The <see cref="DimensionStyle">style</see> to use with the dimension.</param>
         public Angular2LineDimension(Line firstLine, Line secondLine, double offset, Vector3 normal, DimensionStyle style)
             : base(DimensionType.Angular)
         {
             if (firstLine == null)
-                throw new ArgumentNullException("firstLine");
+            {
+                throw new ArgumentNullException(nameof(firstLine));
+            }
+
             if (secondLine == null)
-                throw new ArgumentNullException("secondLine");
+            {
+                throw new ArgumentNullException(nameof(secondLine));
+            }
 
             if (Vector3.AreParallel(firstLine.Direction, secondLine.Direction))
+            {
                 throw new ArgumentException("The two lines that define the dimension are parallel.");
+            }
 
-            IList<Vector3> ocsPoints =
+            List<Vector3> ocsPoints =
                 MathHelper.Transform(
                     new[]
                     {
@@ -123,12 +135,11 @@ namespace netDxf.Entities
             this.startSecondLine = new Vector2(ocsPoints[2].X, ocsPoints[2].Y);
             this.endSecondLine = new Vector2(ocsPoints[3].X, ocsPoints[3].Y);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+            }
             this.offset = offset;
-
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
             this.Normal = normal;
             this.Elevation = ocsPoints[0].Z;
             this.Update();
@@ -162,7 +173,9 @@ namespace netDxf.Entities
             Vector2 dir1 = endFirstLine - startFirstLine;
             Vector2 dir2 = endSecondLine - startSecondLine;
             if (Vector2.AreParallel(dir1, dir2))
+            {
                 throw new ArgumentException("The two lines that define the dimension are parallel.");
+            }
 
             this.startFirstLine = startFirstLine;
             this.endFirstLine = endFirstLine;
@@ -170,12 +183,12 @@ namespace netDxf.Entities
             this.endSecondLine = endSecondLine;
 
             if (offset < 0)
-                throw new ArgumentOutOfRangeException("offset", "The offset value must be equal or greater than zero.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset), "The offset value must be equal or greater than zero.");
+            }
             this.offset = offset;
 
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
             this.Update();
         }
 
@@ -253,7 +266,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("value", "The offset value must be equal or greater than zero.");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "The offset value must be equal or greater than zero.");
+                }
                 this.offset = value;
             }
         }
@@ -261,14 +276,13 @@ namespace netDxf.Entities
         /// <summary>
         /// Actual measurement.
         /// </summary>
-        /// <remarks>The dimension is always measured in the plane defined by the normal.</remarks>
         public override double Measurement
         {
             get
             {
                 Vector2 dirRef1 = this.endFirstLine - this.startFirstLine;
                 Vector2 dirRef2 = this.endSecondLine - this.startSecondLine;
-                return Vector2.AngleBetween(dirRef1, dirRef2)*MathHelper.RadToDeg;
+                return Vector2.AngleBetween(dirRef1, dirRef2) * MathHelper.RadToDeg;
             }
         }
 
@@ -295,24 +309,25 @@ namespace netDxf.Entities
 
         private void SetDimensionLinePosition(Vector2 point, bool updateRefs)
         {
-            Vector2 center = this.CenterPoint;
-
-            if (Vector2.IsNaN(center))
+            Vector2 dir1 = this.endFirstLine - this.startFirstLine;
+            Vector2 dir2 = this.endSecondLine - this.startSecondLine;
+            if (Vector2.AreParallel(dir1, dir2))
+            {
                 throw new ArgumentException("The two lines that define the dimension are parallel.");
+            }
+
+            Vector2 center = this.CenterPoint;
 
             if (updateRefs)
             {
                 double cross = Vector2.CrossProduct(this.EndFirstLine - this.StartFirstLine, this.EndSecondLine - this.StartSecondLine);
                 if (cross < 0)
                 {
-                    Vector2 temp1 = this.startFirstLine;
-                    Vector2 temp2 = this.endFirstLine;
+                    (this.startFirstLine, this.startSecondLine) = (this.startSecondLine, this.startFirstLine);
+                    (this.endFirstLine, this.endSecondLine) = (this.endSecondLine, this.endFirstLine);
 
-                    this.startFirstLine = this.startSecondLine;
-                    this.endFirstLine = this.endSecondLine;
-
-                    this.startSecondLine = temp1;
-                    this.endSecondLine = temp2;
+                    //MathHelper.Swap(ref this.startFirstLine, ref this.startSecondLine);
+                    //MathHelper.Swap(ref this.endFirstLine, ref this.endSecondLine);
                 }
 
                 Vector2 ref1Start = this.StartFirstLine;
@@ -349,12 +364,14 @@ namespace netDxf.Entities
                 }
             }
 
-            this.offset = Vector2.Distance(center, point);
+            double newOffset = Vector2.Distance(center, point);
+            this.offset = MathHelper.IsZero(newOffset) ? MathHelper.Epsilon : newOffset;
+            
             this.defPoint = this.endSecondLine;
 
             double measure = this.Measurement * MathHelper.DegToRad;
             double startAngle = Vector2.Angle(center, this.endFirstLine);
-            double midRot = startAngle + measure * 0.5;
+            double midRot = startAngle + 0.5 * measure;
             Vector2 midDim = Vector2.Polar(center, this.offset, midRot);
             this.arcDefinitionPoint = midDim;
 
@@ -364,12 +381,12 @@ namespace netDxf.Entities
                 double textGap = this.Style.TextOffset;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
                 {
-                    textGap = (double)styleOverride.Value;
+                    textGap = (double) styleOverride.Value;
                 }
                 double scale = this.Style.DimScaleOverall;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
                 {
-                    scale = (double)styleOverride.Value;
+                    scale = (double) styleOverride.Value;
                 }
 
                 double gap = textGap * scale;
@@ -382,25 +399,104 @@ namespace netDxf.Entities
         #region overrides
 
         /// <summary>
+        /// Moves, scales, and/or rotates the current entity given a 3x3 transformation matrix and a translation vector.
+        /// </summary>
+        /// <param name="transformation">Transformation matrix.</param>
+        /// <param name="translation">Translation vector.</param>
+        /// <remarks>
+        /// Non-uniform and zero scaling local to the dimension entity are not supported.<br />
+        /// The transformation will not be applied if the resulting reference lines are parallel.<br />
+        /// Matrix3 adopts the convention of using column vectors to represent a transformation matrix.
+        /// </remarks>
+        public override void TransformBy(Matrix3 transformation, Vector3 translation)
+        {
+            Vector3 newNormal = transformation * this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+
+            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
+
+            Vector3 v = transOW * new Vector3(this.StartFirstLine.X, this.StartFirstLine.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newStart1 = new Vector2(v.X, v.Y);
+            double newElevation = v.Z;
+
+            v = transOW * new Vector3(this.EndFirstLine.X, this.EndFirstLine.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newEnd1 = new Vector2(v.X, v.Y);
+
+            v = transOW * new Vector3(this.StartSecondLine.X, this.StartSecondLine.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newStart2 = new Vector2(v.X, v.Y);
+
+            v = transOW * new Vector3(this.EndSecondLine.X, this.EndSecondLine.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newEnd2 = new Vector2(v.X, v.Y);
+
+            Vector2 dir1 = newEnd1 - newStart1;
+            Vector2 dir2 = newEnd2 - newStart2;
+            if (Vector2.AreParallel(dir1, dir2))
+            {
+                Debug.Assert(false, "The transformation cannot be applied, the resulting reference lines are parallel.");
+                return;
+            }
+
+            v = transOW * new Vector3(this.ArcDefinitionPoint.X, this.ArcDefinitionPoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newArcDefPoint = new Vector2(v.X, v.Y);
+
+            if (this.TextPositionManuallySet)
+            {
+                v = transOW * new Vector3(this.textRefPoint.X, this.textRefPoint.Y, this.Elevation);
+                v = transformation * v + translation;
+                v = transWO * v;
+                this.textRefPoint = new Vector2(v.X, v.Y);
+            }
+
+            v = transOW * new Vector3(this.defPoint.X, this.defPoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            this.defPoint = new Vector2(v.X, v.Y);
+
+            this.StartFirstLine = newStart1;
+            this.EndFirstLine = newEnd1;
+            this.StartSecondLine = newStart2;
+            this.EndSecondLine = newEnd2;
+            this.ArcDefinitionPoint = newArcDefPoint;
+            this.Elevation = newElevation;
+            this.Normal = newNormal;
+
+            this.SetDimensionLinePosition(newArcDefPoint);
+        }
+
+        /// <summary>
         /// Calculate the dimension reference points.
         /// </summary>
-        protected override void CalculteReferencePoints()
+        protected override void CalculateReferencePoints()
         {
+            Vector2 dir1 = this.endFirstLine - this.startFirstLine;
+            Vector2 dir2 = this.endSecondLine - this.startSecondLine;
+            if (Vector2.AreParallel(dir1, dir2))
+            {
+                throw new ArgumentException("The two lines that define the dimension are parallel.");
+            }
+
             DimensionStyleOverride styleOverride;
 
-            double measure = this.Measurement * MathHelper.DegToRad ;
+            double measure = this.Measurement * MathHelper.DegToRad;
             Vector2 center = this.CenterPoint;
 
-            if (Vector2.IsNaN(center))
-                throw new ArgumentException("The two lines that define the dimension are parallel.");
-
             double startAngle = Vector2.Angle(center, this.endFirstLine);
-            double midRot = startAngle + measure * 0.5;
+            double midRot = startAngle + 0.5 * measure;
             Vector2 midDim = Vector2.Polar(center, this.offset, midRot);
 
             this.defPoint = this.endSecondLine;
             this.arcDefinitionPoint = midDim;
-
 
             if (this.TextPositionManuallySet)
             {
@@ -429,7 +525,7 @@ namespace netDxf.Entities
                 }
 
                 double gap = textGap * scale;
-                this.textRefPoint = midDim + gap * Vector2.Normalize(midDim-center);
+                this.textRefPoint = midDim + gap * Vector2.Normalize(midDim - center);
             }
         }
 
@@ -482,15 +578,14 @@ namespace netDxf.Entities
 
             foreach (DimensionStyleOverride styleOverride in this.StyleOverrides.Values)
             {
-                object copy;
-                ICloneable value = styleOverride.Value as ICloneable;
-                copy = value != null ? value.Clone() : styleOverride.Value;
-
+                object copy = styleOverride.Value is ICloneable value ? value.Clone() : styleOverride.Value;
                 entity.StyleOverrides.Add(new DimensionStyleOverride(styleOverride.Type, copy));
             }
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -37,25 +40,34 @@ namespace netDxf.Collections
     {
         #region private fields
 
-        private int maxCapacity = int.MaxValue;
-        protected readonly Dictionary<string, T> list;
-        protected Dictionary<string, List<DxfObject>> references;
+        private readonly Dictionary<string, T> list;
+        private readonly Dictionary<string, DxfObjectReferences> references;
 
         #endregion
 
         #region constructor
 
+        /// <summary>
+        /// Initializes a new instance of the <c>TableObjects</c> class.
+        /// </summary>
+        /// <param name="document">DxfDocument associated with this instance.</param>
+        /// <param name="codeName">DxfCode assigned to this instance.</param>
+        /// <param name="handle">Handle assigned to this instance.</param>
         protected TableObjects(DxfDocument document, string codeName, string handle)
             : base(codeName)
         {
             this.list = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
-            this.references = new Dictionary<string, List<DxfObject>>(StringComparer.OrdinalIgnoreCase);
+            this.references = new Dictionary<string, DxfObjectReferences>(StringComparer.OrdinalIgnoreCase);
             this.Owner = document;
 
             if (string.IsNullOrEmpty(handle))
-                this.Owner.NumHandles = base.AsignHandle(this.Owner.NumHandles);
+            {
+                this.Owner.NumHandles = base.AssignHandle(this.Owner.NumHandles);
+            }
             else
+            {
                 this.Handle = handle;
+            }
 
             this.Owner.AddedObjects.Add(this.Handle, this);
         }
@@ -72,11 +84,7 @@ namespace netDxf.Collections
         /// <remarks>Table object names are case insensitive.</remarks>
         public T this[string name]
         {
-            get
-            {
-                T item;
-                return this.list.TryGetValue(name, out item) ? item : null;
-            }
+            get { return this.list.TryGetValue(name, out T item) ? item : null; }
         }
 
         /// <summary>
@@ -104,19 +112,7 @@ namespace netDxf.Collections
         }
 
         /// <summary>
-        /// Gets the maximum number of objects the collection can hold.
-        /// </summary>
-        /// <remarks>
-        /// This is an approximate value, the actual exact value is unknown. In any case is not recommended to get even close to this number for any practical use.
-        /// </remarks>
-        public int MaxCapacity
-        {
-            get { return this.maxCapacity; }
-            internal set { this.maxCapacity = value; }
-        }
-
-        /// <summary>
-        /// Gets the owner of the actual dxf object.
+        /// Gets the owner of the actual DXF object.
         /// </summary>
         public new DxfDocument Owner
         {
@@ -128,10 +124,12 @@ namespace netDxf.Collections
 
         #region internal properties
 
-        /// <summary>
-        /// Gets the <see cref="DxfObject">dxf objects</see> referenced by a T.
-        /// </summary>
-        internal Dictionary<string, List<DxfObject>> References
+        internal Dictionary<string, T> List
+        {
+            get { return this.list; }
+        }
+
+        internal Dictionary<string, DxfObjectReferences> References
         {
             get { return this.references; }
         }
@@ -139,6 +137,30 @@ namespace netDxf.Collections
         #endregion
 
         #region public methods
+
+        /// <summary>
+        /// Checks if the specified TableObject has been referenced by other DxfObjects. 
+        /// </summary>
+        /// <param name="name">Table object name.</param>
+        /// <returns>
+        /// Returns true if the specified TableObject has been referenced by other DxfObjects, false otherwise.
+        /// </returns>
+        public bool HasReferences(string name)
+        {
+            return !this.references[name].IsEmpty();
+        }
+
+        /// <summary>
+        /// Checks if the specified TableObject has been referenced by other DxfObjects. 
+        /// </summary>
+        /// <param name="item">Table object.</param>
+        /// <returns>
+        /// Returns true if the specified TableObject has been referenced by other DxfObjects, false otherwise.
+        /// </returns>
+        public bool HasReferences(T item)
+        {
+            return !this.references[item.Name].IsEmpty();
+        }
 
         /// <summary>
         /// Gets the <see cref="DxfObject">dxf objects</see> referenced by a T.
@@ -149,11 +171,9 @@ namespace netDxf.Collections
         /// If there is no table object with the specified name in the list the method an empty list.<br />
         /// The Groups collection method GetReferences will always return an empty list since there are no DxfObjects that references them.
         /// </remarks>
-        public List<DxfObject> GetReferences(string name)
+        public List<DxfObjectReference> GetReferences(string name)
         {
-            if (!this.Contains(name))
-                return new List<DxfObject>();
-            return new List<DxfObject>(this.references[name]);
+            return this.references[name].ToList();
         }
 
         /// <summary>
@@ -165,11 +185,9 @@ namespace netDxf.Collections
         /// If there is no table object with the specified name in the list the method an empty list.<br />
         /// The Groups collection method GetReferences will always return an empty list since there are no DxfObjects that references them.
         /// </remarks>
-        public List<DxfObject> GetReferences(T item)
+        public List<DxfObjectReference> GetReferences(T item)
         {
-            if (item == null)
-                throw new ArgumentNullException("item");
-            return this.GetReferences(item.Name);
+            return this.references[item.Name].ToList();
         }
 
         /// <summary>
@@ -215,7 +233,10 @@ namespace netDxf.Collections
         public T Add(T item)
         {
             if (item == null)
-                throw new ArgumentNullException("item");
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
             return this.Add(item, true);
         }
 
@@ -245,7 +266,9 @@ namespace netDxf.Collections
             string[] names = new string[this.list.Count];
             this.list.Keys.CopyTo(names, 0);
             foreach (string o in names)
+            {
                 this.Remove(o);
+            }
         }
 
         #endregion

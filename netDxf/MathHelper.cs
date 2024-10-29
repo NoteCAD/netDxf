@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2017 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2017 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -81,15 +84,61 @@ namespace netDxf
         /// <summary>
         /// Represents the smallest number used for comparison purposes.
         /// </summary>
+        /// <remarks>
+        /// The epsilon value must be a positive number greater than zero.
+        /// </remarks>
         public static double Epsilon
         {
             get { return epsilon; }
-            set { epsilon = value; }
+            set
+            {
+                if (value <= 0.0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The epsilon value must be a positive number greater than zero.");
+                }
+                epsilon = value;
+            }
         }
 
         #endregion
 
         #region static methods
+
+        /// <summary>
+        /// Returns a value indicating the sign of a double-precision floating-point number.
+        /// </summary>
+        /// <param name="number">Double precision number.
+        /// </param>
+        /// <returns>
+        /// A number that indicates the sign of value.
+        /// Return value, meaning:<br />
+        /// -1 value is less than zero.<br />
+        /// 0 value is equal to zero.<br />
+        /// 1 value is greater than zero.
+        /// </returns>
+        /// <remarks>This method will test for values of numbers very close to zero.</remarks>
+        public static int Sign(double number)
+        {
+            return IsZero(number) ? 0 : Math.Sign(number);
+        }
+
+        /// <summary>
+        /// Returns a value indicating the sign of a double-precision floating-point number.
+        /// </summary>
+        /// <param name="number">Double precision number.</param>
+        /// <param name="threshold">Tolerance.</param>
+        /// <returns>
+        /// A number that indicates the sign of value.
+        /// Return value, meaning:<br />
+        /// -1 value is less than zero.<br />
+        /// 0 value is equal to zero.<br />
+        /// 1 value is greater than zero.
+        /// </returns>
+        /// <remarks>This method will test for values of numbers very close to zero.</remarks>
+        public static int Sign(double number, double threshold)
+        {
+            return IsZero(number, threshold) ? 0 : Math.Sign(number);
+        }
 
         /// <summary>
         /// Checks if a number is close to one.
@@ -168,19 +217,21 @@ namespace netDxf
         {
             // if the rotation is 0 no transformation is needed the transformation matrix is the identity
             if (IsZero(rotation))
+            {
                 return point;
+            }
 
             double sin = Math.Sin(rotation);
             double cos = Math.Cos(rotation);
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                return new Vector2(point.X*cos + point.Y*sin, -point.X*sin + point.Y*cos);
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                    return new Vector2(point.X*cos + point.Y*sin, -point.X*sin + point.Y*cos);
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                    return new Vector2(point.X*cos - point.Y*sin, point.X*sin + point.Y*cos);
+                default:
+                    return point;
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
-            {
-                return new Vector2(point.X*cos - point.Y*sin, point.X*sin + point.Y*cos);
-            }
-            return point;
         }
 
         /// <summary>
@@ -191,33 +242,46 @@ namespace netDxf
         /// <param name="from">Point coordinate system.</param>
         /// <param name="to">Coordinate system of the transformed point.</param>
         /// <returns>Transformed point list.</returns>
-        public static IList<Vector2> Transform(IEnumerable<Vector2> points, double rotation, CoordinateSystem from, CoordinateSystem to)
+        public static List<Vector2> Transform(IEnumerable<Vector2> points, double rotation, CoordinateSystem from, CoordinateSystem to)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+            {
+                throw new ArgumentNullException(nameof(points));
+            }
 
             // if the rotation is 0 no transformation is needed the transformation matrix is the identity
             if (IsZero(rotation))
+            {
                 return new List<Vector2>(points);
+            }
 
             double sin = Math.Sin(rotation);
             double cos = Math.Cos(rotation);
+
             List<Vector2> transPoints;
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                transPoints = new List<Vector2>();
-                foreach (Vector2 p in points)
-                    transPoints.Add(new Vector2(p.X*cos + p.Y*sin, -p.X*sin + p.Y*cos));
-                return transPoints;
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                {
+                    transPoints = new List<Vector2>();
+                    foreach (Vector2 p in points)
+                    {
+                        transPoints.Add(new Vector2(p.X * cos + p.Y * sin, -p.X * sin + p.Y * cos));
+                    }
+                    return transPoints;
+                }
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                {
+                    transPoints = new List<Vector2>();
+                    foreach (Vector2 p in points)
+                    {
+                        transPoints.Add(new Vector2(p.X * cos - p.Y * sin, p.X * sin + p.Y * cos));
+                    }
+                    return transPoints;
+                }
+                default:
+                    return new List<Vector2>(points);
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
-            {
-                transPoints = new List<Vector2>();
-                foreach (Vector2 p in points)
-                    transPoints.Add(new Vector2(p.X*cos - p.Y*sin, p.X*sin + p.Y*cos));
-                return transPoints;
-            }
-            return new List<Vector2>(points);
         }
 
         /// <summary>
@@ -230,21 +294,17 @@ namespace netDxf
         /// <returns>Transformed point.</returns>
         public static Vector3 Transform(Vector3 point, Vector3 zAxis, CoordinateSystem from, CoordinateSystem to)
         {
-            // if the normal is (0,0,1) no transformation is needed the transformation matrix is the identity
-            if (zAxis.Equals(Vector3.UnitZ))
-                return point;
-
             Matrix3 trans = ArbitraryAxis(zAxis);
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                trans = trans.Transpose();
-                return trans*point;
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                    trans = trans.Transpose();
+                    return trans * point;
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                    return trans * point;
+                default:
+                    return point;
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
-            {
-                return trans*point;
-            }
-            return point;
         }
 
         /// <summary>
@@ -255,36 +315,118 @@ namespace netDxf
         /// <param name="from">Points coordinate system.</param>
         /// <param name="to">Coordinate system of the transformed points.</param>
         /// <returns>Transformed point list.</returns>
-        public static IList<Vector3> Transform(IEnumerable<Vector3> points, Vector3 zAxis, CoordinateSystem from, CoordinateSystem to)
+        public static List<Vector3> Transform(IEnumerable<Vector3> points, Vector3 zAxis, CoordinateSystem from, CoordinateSystem to)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
-
-            if (zAxis.Equals(Vector3.UnitZ))
-                return new List<Vector3>(points);
+            {
+                throw new ArgumentNullException(nameof(points));
+            }
 
             Matrix3 trans = ArbitraryAxis(zAxis);
             List<Vector3> transPoints;
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                transPoints = new List<Vector3>();
-                trans = trans.Transpose();
-                foreach (Vector3 p in points)
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
                 {
-                    transPoints.Add(trans*p);
+                    transPoints = new List<Vector3>();
+                    trans = trans.Transpose();
+                    foreach (Vector3 p in points)
+                    {
+                        transPoints.Add(trans * p);
+                    }
+                    return transPoints;
                 }
-                return transPoints;
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                {
+                    transPoints = new List<Vector3>();
+                    foreach (Vector3 p in points)
+                    {
+                        transPoints.Add(trans * p);
+                    }
+                    return transPoints;
+                }
+                default:
+                    return new List<Vector3>(points);
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
+        }
+
+        /// <summary>
+        /// Transform a 2d point from object coordinates to world coordinates.
+        /// </summary>
+        /// <param name="point">Points to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Object elevation.</param>
+        /// <returns>Transformed point.</returns>
+        public static Vector3 Transform(Vector2 point, Vector3 zAxis, double elevation)
+        {
+            Matrix3 trans = ArbitraryAxis(zAxis);
+            return trans * new Vector3(point.X, point.Y, elevation);
+        }
+
+        /// <summary>
+        /// Transform a 2d point list from object coordinates to world coordinates.
+        /// </summary>
+        /// <param name="points">Point to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Object elevation.</param>
+        /// <returns>Transformed points.</returns>
+        public static List<Vector3> Transform(IEnumerable<Vector2> points, Vector3 zAxis, double elevation)
+        {
+            if (points == null)
             {
-                transPoints = new List<Vector3>();
-                foreach (Vector3 p in points)
-                {
-                    transPoints.Add(trans*p);
-                }
-                return transPoints;
+                throw new ArgumentNullException(nameof(points));
             }
-            return new List<Vector3>(points);
+
+            List<Vector3> transPoints = new List<Vector3>();
+            Matrix3 trans = ArbitraryAxis(zAxis);
+            foreach (Vector2 p in points)
+            {
+                transPoints.Add(trans * new Vector3(p.X, p.Y, elevation));
+            }
+            return transPoints;
+        }
+
+        /// <summary>
+        /// Transform a 3d point from world coordinates to object coordinates.
+        /// </summary>
+        /// <param name="point">Point to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Z axis value of the transformed point.</param>
+        /// <returns>Transformed point.</returns>
+        public static Vector2 Transform(Vector3 point, Vector3 zAxis, out double elevation)
+        {
+            Matrix3 trans = ArbitraryAxis(zAxis).Transpose();
+            Vector3 p = trans * point;
+            elevation = p.Z;
+            return new Vector2(p.X, p.Y);
+        }
+
+        /// <summary>
+        /// Transform a 3d point list from world coordinates to object coordinates.
+        /// </summary>
+        /// <param name="points">Points to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Average Z axis value of the transformed points.</param>
+        /// <returns>Transformed points.</returns>
+        public static List<Vector2> Transform(IEnumerable<Vector3> points, Vector3 zAxis, out double elevation)
+        {
+            if (points == null)
+            {
+                throw new ArgumentNullException(nameof(points));
+            }
+
+            List<Vector2> transPoints = new List<Vector2>();
+            Matrix3 trans = ArbitraryAxis(zAxis).Transpose();
+            elevation = 0.0;
+            foreach (Vector3 point in points)
+            {
+                Vector3 p = trans * point;
+                elevation += p.Z;
+                transPoints.Add(new Vector2(p.X, p.Y));
+            }
+
+            elevation /= transPoints.Count;
+            return transPoints;
         }
 
         /// <summary>
@@ -295,14 +437,24 @@ namespace netDxf
         public static Matrix3 ArbitraryAxis(Vector3 zAxis)
         {
             zAxis.Normalize();
+
+            if (zAxis.Equals(Vector3.UnitZ))
+            {
+                return Matrix3.Identity;
+            }
+
             Vector3 wY = Vector3.UnitY;
             Vector3 wZ = Vector3.UnitZ;
             Vector3 aX;
 
-            if ((Math.Abs(zAxis.X) < 1/64.0) && (Math.Abs(zAxis.Y) < 1/64.0))
+            if ((Math.Abs(zAxis.X) < 1 / 64.0) && (Math.Abs(zAxis.Y) < 1 / 64.0))
+            {
                 aX = Vector3.CrossProduct(wY, zAxis);
+            }
             else
+            {
                 aX = Vector3.CrossProduct(wZ, zAxis);
+            }
 
             aX.Normalize();
 
@@ -322,7 +474,7 @@ namespace netDxf
         public static double PointLineDistance(Vector3 p, Vector3 origin, Vector3 dir)
         {
             double t = Vector3.DotProduct(dir, p - origin);
-            Vector3 pPrime = origin + t*dir;
+            Vector3 pPrime = origin + t * dir;
             Vector3 vec = p - pPrime;
             double distanceSquared = Vector3.DotProduct(vec, vec);
             return Math.Sqrt(distanceSquared);
@@ -338,7 +490,7 @@ namespace netDxf
         public static double PointLineDistance(Vector2 p, Vector2 origin, Vector2 dir)
         {
             double t = Vector2.DotProduct(dir, p - origin);
-            Vector2 pPrime = origin + t*dir;
+            Vector2 pPrime = origin + t * dir;
             Vector2 vec = p - pPrime;
             double distanceSquared = Vector2.DotProduct(vec, vec);
             return Math.Sqrt(distanceSquared);
@@ -351,17 +503,22 @@ namespace netDxf
         /// <param name="start">Segment start point.</param>
         /// <param name="end">Segment end point.</param>
         /// <returns>Zero if the point is inside the segment, 1 if the point is after the end point, and -1 if the point is before the start point.</returns>
+        /// <remarks>
+        /// For testing purposes a point is considered inside a segment,
+        /// if it falls inside the volume from start to end of the segment that extends infinitely perpendicularly to its direction.
+        /// Later, if needed, you can use the PointLineDistance method, if the distance is zero the point is along the line defined by the start and end points.
+        /// </remarks>
         public static int PointInSegment(Vector3 p, Vector3 start, Vector3 end)
         {
             Vector3 dir = end - start;
             Vector3 pPrime = p - start;
             double t = Vector3.DotProduct(dir, pPrime);
-            if (t <= 0)
+            if (t < 0)
             {
                 return -1;
             }
             double dot = Vector3.DotProduct(dir, dir);
-            if (t >= dot)
+            if (t > dot)
             {
                 return 1;
             }
@@ -375,17 +532,22 @@ namespace netDxf
         /// <param name="start">Segment start point.</param>
         /// <param name="end">Segment end point.</param>
         /// <returns>Zero if the point is inside the segment, 1 if the point is after the end point, and -1 if the point is before the start point.</returns>
+        /// <remarks>
+        /// For testing purposes a point is considered inside a segment,
+        /// if it falls inside the area from start to end of the segment that extends infinitely perpendicularly to its direction.
+        /// Later, if needed, you can use the PointLineDistance method, if the distance is zero the point is along the line defined by the start and end points.
+        /// </remarks>
         public static int PointInSegment(Vector2 p, Vector2 start, Vector2 end)
         {
             Vector2 dir = end - start;
             Vector2 pPrime = p - start;
             double t = Vector2.DotProduct(dir, pPrime);
-            if (t <= 0)
+            if (t < 0)
             {
                 return -1;
             }
             double dot = Vector2.DotProduct(dir, dir);
-            if (t >= dot)
+            if (t > dot)
             {
                 return 1;
             }
@@ -399,7 +561,7 @@ namespace netDxf
         /// <param name="dir0">First line direction.</param>
         /// <param name="point1">Second line origin point.</param>
         /// <param name="dir1">Second line direction.</param>
-        /// <returns>The intersection point between the two line.</returns>
+        /// <returns>The intersection point between the two lines.</returns>
         /// <remarks>If the lines are parallel the method will return a <see cref="Vector2.NaN">Vector2.NaN</see>.</remarks>
         public static Vector2 FindIntersection(Vector2 point0, Vector2 dir0, Vector2 point1, Vector2 dir1)
         {
@@ -414,19 +576,21 @@ namespace netDxf
         /// <param name="point1">Second line origin point.</param>
         /// <param name="dir1">Second line direction.</param>
         /// <param name="threshold">Tolerance.</param>
-        /// <returns>The intersection point between the two line.</returns>
+        /// <returns>The intersection point between the two lines.</returns>
         /// <remarks>If the lines are parallel the method will return a <see cref="Vector2.NaN">Vector2.NaN</see>.</remarks>
         public static Vector2 FindIntersection(Vector2 point0, Vector2 dir0, Vector2 point1, Vector2 dir1, double threshold)
         {
             // test for parallelism.
             if (Vector2.AreParallel(dir0, dir1, threshold))
-                return new Vector2(double.NaN, double.NaN);
+            {
+                return Vector2.NaN;
+            }
 
             // lines are not parallel
-            Vector2 vect = point1 - point0;
+            Vector2 v = point1 - point0;
             double cross = Vector2.CrossProduct(dir0, dir1);
-            double s = (vect.X*dir1.Y - vect.Y*dir1.X)/cross;
-            return point0 + s*dir0;
+            double s = (v.X * dir1.Y - v.Y * dir1.X) / cross;
+            return point0 + s * dir0;
         }
 
         /// <summary>
@@ -437,10 +601,18 @@ namespace netDxf
         /// <remarks>Negative angles will be converted to its positive equivalent.</remarks>
         public static double NormalizeAngle(double angle)
         {
-            double c = angle%360.0;
-            if (c < 0)
-                return 360.0 + c;
-            return c;
+            double normalized = angle % 360.0;
+            if (IsZero(normalized) || IsEqual(Math.Abs(normalized), 360.0))
+            {
+                return 0.0;
+            }
+
+            if (normalized < 0)
+            {
+                return 360.0 + normalized;
+            }
+
+            return normalized;
         }
 
         /// <summary>
@@ -454,34 +626,64 @@ namespace netDxf
             double multiplier = Math.Round(number/roundTo, 0);
             return multiplier * roundTo;
         }
+        
+        /// <summary>
+        /// Obtains the data for an arc that has a start point, an end point, and a bulge value.
+        /// </summary>
+        /// <param name="startPoint">Arc start point.</param>
+        /// <param name="endPoint">Arc end point.</param>
+        /// <param name="bulge">Arc bulge value.</param>
+        /// <returns>A Tuple(center, radius, startAngle in degrees, endAngle in degrees) with the arc data.</returns>
+        public static Tuple<Vector2, double, double, double> ArcFromBulge(Vector2 startPoint, Vector2 endPoint, double bulge)
+        {
+            if (IsZero(bulge))
+            {
+                throw new ArgumentOutOfRangeException(nameof(bulge), bulge, "The bulge value must be different than zero to make an arc.");
+            }
+            double theta = 4 * Math.Atan(Math.Abs(bulge));
+            double dist = 0.5 * Vector2.Distance(startPoint, endPoint);
+            double gamma = 0.5 * (Math.PI - theta);
+            double phi = Vector2.Angle(startPoint, endPoint) + Math.Sign(bulge) * gamma;
+
+            double radius = dist / Math.Sin(0.5 * theta);
+            Vector2 center = new Vector2(startPoint.X + radius * Math.Cos(phi), startPoint.Y + radius * Math.Sin(phi));
+            double startAngle;
+            double endAngle;
+            if (bulge > 0)
+            {
+                startAngle = NormalizeAngle(Vector2.Angle(startPoint - center) * RadToDeg);
+                endAngle = NormalizeAngle(startAngle + theta * RadToDeg);
+            }
+            else
+            {
+                endAngle = NormalizeAngle(Vector2.Angle(startPoint - center) * RadToDeg);
+                startAngle = NormalizeAngle(endAngle - theta * RadToDeg);
+            }
+
+            return new Tuple<Vector2, double, double, double>(center, radius, startAngle, endAngle);
+        }
 
         /// <summary>
-        /// Rotate given vector of angle in radians about a specified axis.
+        /// Obtains the start point, end point, and bulge value from an arc.
         /// </summary>
-        /// <param name="v">Vector to rotate.</param>
-        /// <param name="axis">Rotation axis. This vector should be normalized.</param>
-        /// <param name="angle">Rotation angle in radians.</param>        
-        /// <returns>A copy of the vector, rotated.</returns>
-        /// <remarks>Method provided by: Idelana. Original Author: Paul Bourke ( http://paulbourke.net/geometry/rotate/ )</remarks>
-        public static Vector3 RotateAboutAxis(Vector3 v, Vector3 axis, double angle)
+        /// <param name="center">Arc center.</param>
+        /// <param name="radius">Arc radius.</param>
+        /// <param name="startAngle">Arc start angle in degrees.</param>
+        /// <param name="endAngle">Arc end angle in degrees.</param>
+        /// <returns>A Tuple(start point, end point, bulge value) for the specified arc data.</returns>
+        public static Tuple<Vector2, Vector2, double> ArcToBulge(Vector2 center, double radius, double startAngle, double endAngle)
         {
-            Vector3 q = new Vector3();
-            double cos = Math.Cos(angle);
-            double sin = Math.Sin(angle);
+            if (radius <= 0.0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(radius), radius, "The arc radius larger than zero.");
+            }
 
-            q.X += (cos + (1 - cos)*axis.X*axis.X)*v.X;
-            q.X += ((1 - cos)*axis.X*axis.Y - axis.Z*sin)*v.Y;
-            q.X += ((1 - cos)*axis.X*axis.Z + axis.Y*sin)*v.Z;
+            double arcAngle = (endAngle - startAngle) * DegToRad;
+            double bulge = Math.Tan(arcAngle / 4);
+            Vector2 startPoint = Vector2.Polar(center, radius, startAngle * DegToRad);
+            Vector2 endPoint = Vector2.Polar(center, radius, endAngle * DegToRad);
 
-            q.Y += ((1 - cos)*axis.X*axis.Y + axis.Z*sin)*v.X;
-            q.Y += (cos + (1 - cos)*axis.Y*axis.Y)*v.Y;
-            q.Y += ((1 - cos)*axis.Y*axis.Z - axis.X*sin)*v.Z;
-
-            q.Z += ((1 - cos)*axis.X*axis.Z - axis.Y*sin)*v.X;
-            q.Z += ((1 - cos)*axis.Y*axis.Z + axis.X*sin)*v.Y;
-            q.Z += (cos + (1 - cos)*axis.Z*axis.Z)*v.Z;
-
-            return q;
+            return new Tuple<Vector2, Vector2, double>(startPoint, endPoint, bulge);
         }
 
         #endregion

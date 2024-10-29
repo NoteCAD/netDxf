@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -33,9 +36,7 @@ namespace netDxf.Tables
         #region delegates and events
 
         public delegate void TextStyleChangedEventHandler(LinetypeTextSegment sender, TableObjectChangedEventArgs<TextStyle> e);
-
         public event TextStyleChangedEventHandler TextStyleChanged;
-
         protected virtual TextStyle OnTextStyleChangedEvent(TextStyle oldTextStyle, TextStyle newTextStyle)
         {
             TextStyleChangedEventHandler ae = this.TextStyleChanged;
@@ -66,7 +67,7 @@ namespace netDxf.Tables
         /// <summary>
         /// Initializes a new instance of the <c>LinetypeShapeSegment</c> class.
         /// </summary>
-        public LinetypeTextSegment() : this(string.Empty, TextStyle.Default, 0.0, Vector2.Zero, LinetypeSegmentRotationType.Relative, 0.0, 1.0)
+        public LinetypeTextSegment() : this(string.Empty, TextStyle.Default, 1.0, Vector2.Zero, LinetypeSegmentRotationType.Relative, 0.0, 1.0)
         {
         }
 
@@ -90,18 +91,14 @@ namespace netDxf.Tables
         /// <param name="rotationType">Type of rotation defined by the rotation value.</param>
         /// <param name="rotation">Rotation of the text.</param>
         /// <param name="scale">Scale of the text.</param>
-        public LinetypeTextSegment(string text, TextStyle style, double length, Vector2 offset, LinetypeSegmentRotationType rotationType, double rotation, double scale) : base(LinetypeSegmentType.Text, length)
+        public LinetypeTextSegment(string text, TextStyle style, double length, Vector2 offset, LinetypeSegmentRotationType rotationType, double rotation, double scale)
+            : base(LinetypeSegmentType.Text, length)
         {
-            if (string.IsNullOrEmpty(text)) this.text = string.Empty;
-            this.text = text;
-            if (style == null)
-                throw new ArgumentNullException("style", "The style must be a valid TextStyle.");
-            this.style = style;
+            this.text = string.IsNullOrEmpty(text) ? string.Empty : text;
+            this.style = style ?? throw new ArgumentNullException(nameof(style), "The style must be a valid TextStyle.");
             this.offset = offset;
             this.rotationType = rotationType;
             this.rotation = MathHelper.NormalizeAngle(rotation);
-            if (scale <= 0)
-                throw new ArgumentOutOfRangeException("scale", scale, "The LinetypeTextSegment scale must be greater than zero.");
             this.scale = scale;
         }
 
@@ -115,12 +112,7 @@ namespace netDxf.Tables
         public string Text
         {
             get { return this.text; }
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                    this.text = string.Empty;
-                this.text = value;
-            }
+            set { this.text = string.IsNullOrEmpty(value) ? string.Empty : value; }
         }
 
         /// <summary>
@@ -132,7 +124,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }
@@ -167,19 +161,10 @@ namespace netDxf.Tables
         /// <summary>
         /// Gets or sets the scale of the text relative to the scale of the linetype.
         /// </summary>
-        /// <remarks>
-        /// The height of the text style is multiplied by the scale factor.
-        /// If the height of the text style is 0, the scale value alone is used as the height.
-        /// </remarks>
         public double Scale
         {
             get { return this.scale; }
-            set
-            {
-                if (value <= 0)
-                    throw new ArgumentOutOfRangeException("value", value, "The linetype text segment scale must be greater than zero.");
-                this.scale = value;
-            }
+            set { this.scale = value; }
         }
 
         #endregion

@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -43,7 +46,6 @@ namespace netDxf.Collections
         internal Linetypes(DxfDocument document, string handle)
             : base(document, DxfObjectCode.LinetypeTable, handle)
         {
-            this.MaxCapacity = short.MaxValue;
         }
 
         #endregion
@@ -62,7 +64,9 @@ namespace netDxf.Collections
         {
             string f = this.Owner.SupportFolders.FindFile(file);
             if (string.IsNullOrEmpty(f))
+            {
                 throw new FileNotFoundException("The file has not been found.", file);
+            }
 
             return Linetype.NamesFromFile(f);
         }
@@ -79,8 +83,10 @@ namespace netDxf.Collections
         public void AddFromFile(string file, bool reload)
         {
             string f = this.Owner.SupportFolders.FindFile(file);
-            if(string.IsNullOrEmpty(f))
+            if (string.IsNullOrEmpty(f))
+            {
                 throw new FileNotFoundException("The LIN file has not been found.", file);
+            }
 
             List<string> names = Linetype.NamesFromFile(f);
             foreach (string name in names)
@@ -105,19 +111,25 @@ namespace netDxf.Collections
         /// </remarks>
         public bool AddFromFile(string file, string linetypeName, bool reload)
         {
-            Linetype linetype;
             string f = this.Owner.SupportFolders.FindFile(file);
             if (string.IsNullOrEmpty(f))
-                throw new FileNotFoundException("The LIN file has not been found.", file);
-
-            linetype = Linetype.Load(f, linetypeName);
-
-            if (linetype == null) return false;
-
-            Linetype existing;
-            if (this.TryGetValue(linetype.Name, out existing))
             {
-                if (!reload) return false;
+                throw new FileNotFoundException("The LIN file has not been found.", file);
+            }
+
+            Linetype linetype = Linetype.Load(f, linetypeName);
+
+            if (linetype == null)
+            {
+                return false;
+            }
+
+            if (this.TryGetValue(linetype.Name, out Linetype existing))
+            {
+                if (!reload)
+                {
+                    return false;
+                }
 
                 existing.Description = linetype.Description;
                 existing.Segments.Clear();
@@ -138,10 +150,12 @@ namespace netDxf.Collections
         public void Save(string file, bool overwrite)
         {
             if(overwrite) File.Delete(file);
-            foreach (Linetype lt in this.list.Values)
+            foreach (Linetype lt in this.List.Values)
             {
-                if(!lt.IsReserved)
+                if (!lt.IsReserved)
+                {
                     lt.Save(file);
+                }
             }
         }
 
@@ -160,18 +174,20 @@ namespace netDxf.Collections
         /// </returns>
         internal override Linetype Add(Linetype linetype, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (linetype == null)
-                throw new ArgumentNullException("linetype");
+            {
+                throw new ArgumentNullException(nameof(linetype));
+            }
 
-            Linetype add;
-
-            if (this.list.TryGetValue(linetype.Name, out add))
+            if (this.List.TryGetValue(linetype.Name, out Linetype add))
+            {
                 return add;
+            }
 
             if (assignHandle || string.IsNullOrEmpty(linetype.Handle))
-                this.Owner.NumHandles = linetype.AsignHandle(this.Owner.NumHandles);
+            {
+                this.Owner.NumHandles = linetype.AssignHandle(this.Owner.NumHandles);
+            }
 
             foreach (LinetypeSegment segment in linetype.Segments)
             {
@@ -183,16 +199,19 @@ namespace netDxf.Collections
                 }
                 if (segment.Type == LinetypeSegmentType.Shape)
                 {
-                    LinetypeShapeSegment shapeSegment = (LinetypeShapeSegment)segment;
+                    LinetypeShapeSegment shapeSegment = (LinetypeShapeSegment) segment;
                     shapeSegment.Style = this.Owner.ShapeStyles.Add(shapeSegment.Style);
                     this.Owner.ShapeStyles.References[shapeSegment.Style.Name].Add(linetype);
-                    if(!shapeSegment.Style.ContainsShapeName(shapeSegment.Name))
-                        throw new ArgumentException("The linetype contains a shape segment which style does not contain a shape with the stored name.", "linetype");
+                    //TODO: shape names and indexes, require check to external SHX file
+                    //if (!shapeSegment.Style.ContainsShapeName(shapeSegment.Name))
+                    //{
+                    //    throw new ArgumentException("The linetype contains a shape segment which style does not contain a shape with the stored name.", nameof(linetype));
+                    //}
                 }
             }
 
-            this.list.Add(linetype.Name, linetype);
-            this.references.Add(linetype.Name, new List<DxfObject>());
+            this.List.Add(linetype.Name, linetype);
+            this.References.Add(linetype.Name, new DxfObjectReferences());
 
             linetype.Owner = this;
 
@@ -200,6 +219,7 @@ namespace netDxf.Collections
             linetype.LinetypeSegmentAdded += this.Linetype_SegmentAdded;
             linetype.LinetypeSegmentRemoved += this.Linetype_SegmentRemoved;
             linetype.LinetypeTextSegmentStyleChanged += this.Linetype_TextSegmentStyleChanged;
+            linetype.LinetypeShapeSegmentStyleChanged += this.Linetype_ShapeSegmentStyleChanged;
 
             this.Owner.AddedObjects.Add(linetype.Handle, linetype);
 
@@ -226,25 +246,41 @@ namespace netDxf.Collections
         public override bool Remove(Linetype item)
         {
             if (item == null)
+            {
                 return false;
+            }
 
             if (!this.Contains(item))
+            {
                 return false;
+            }
 
             if (item.IsReserved)
+            {
                 return false;
+            }
 
-            if (this.references[item.Name].Count != 0)
+            if (this.HasReferences(item))
+            {
                 return false;
+            }
+
+            LinetypeSegment[] segments = new LinetypeSegment[item.Segments.Count];
+            item.Segments.CopyTo(segments, 0);
+            item.Segments.Remove(segments);
 
             this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            this.References.Remove(item.Name);
+            this.List.Remove(item.Name);
 
             item.Handle = null;
             item.Owner = null;
 
             item.NameChanged -= this.Item_NameChanged;
+            item.LinetypeSegmentAdded -= this.Linetype_SegmentAdded;
+            item.LinetypeSegmentRemoved -= this.Linetype_SegmentRemoved;
+            item.LinetypeTextSegmentStyleChanged -= this.Linetype_TextSegmentStyleChanged;
+            item.LinetypeShapeSegmentStyleChanged -= this.Linetype_ShapeSegmentStyleChanged;
 
             return true;
         }
@@ -256,14 +292,17 @@ namespace netDxf.Collections
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
             if (this.Contains(e.NewValue))
+            {
                 throw new ArgumentException("There is already another line type with the same name.");
+            }
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (Linetype) sender);
+            this.List.Remove(sender.Name);
+            this.List.Add(e.NewValue, (Linetype) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObjectReference> refs = this.GetReferences(sender.Name);
+            this.References.Remove(sender.Name);
+            this.References.Add(e.NewValue, new DxfObjectReferences());
+            this.References[e.NewValue].Add(refs);
         }
 
         private void Linetype_SegmentAdded(Linetype sender, LinetypeSegmentChangeEventArgs e)
@@ -272,13 +311,14 @@ namespace netDxf.Collections
             {
                 LinetypeTextSegment textSegment = (LinetypeTextSegment)e.Item;
                 textSegment.Style = this.Owner.TextStyles.Add(textSegment.Style);
-                //this.Owner.TextStyles.References[textSegment.Style.Name].Add(sender);
+                this.Owner.TextStyles.References[textSegment.Style.Name].Add(sender);
             }
+
             if (e.Item.Type == LinetypeSegmentType.Shape)
             {
                 LinetypeShapeSegment shapeSegment = (LinetypeShapeSegment)e.Item;
                 shapeSegment.Style = this.Owner.ShapeStyles.Add(shapeSegment.Style);
-                //this.Owner.ShapeStyles.References[shapeSegment.Name].Add(sender);
+                this.Owner.ShapeStyles.References[shapeSegment.Style.Name].Add(sender);
             }
         }
 
@@ -290,16 +330,22 @@ namespace netDxf.Collections
             }
             if (e.Item.Type == LinetypeSegmentType.Shape)
             {
-                this.Owner.ShapeStyles.References[((LinetypeShapeSegment)e.Item).Name].Remove(sender);
+                this.Owner.ShapeStyles.References[((LinetypeShapeSegment)e.Item).Style.Name].Remove(sender);
             }
         }
 
         private void Linetype_TextSegmentStyleChanged(Linetype sender, TableObjectChangedEventArgs<TextStyle> e)
         {
             this.Owner.TextStyles.References[e.OldValue.Name].Remove(sender);
-
             e.NewValue = this.Owner.TextStyles.Add(e.NewValue);
             this.Owner.TextStyles.References[e.NewValue.Name].Add(sender);
+        }
+
+        private void Linetype_ShapeSegmentStyleChanged(Linetype sender, TableObjectChangedEventArgs<ShapeStyle> e)
+        {
+            this.Owner.ShapeStyles.References[e.OldValue.Name].Remove(sender);
+            e.NewValue = this.Owner.ShapeStyles.Add(e.NewValue);
+            this.Owner.ShapeStyles.References[e.NewValue.Name].Add(sender);
         }
 
         #endregion

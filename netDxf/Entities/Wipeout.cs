@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2017 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2017 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -30,8 +33,8 @@ namespace netDxf.Entities
     /// Represents a wipeout <see cref="EntityObject">entity</see>.
     /// </summary>
     /// <remarks>
-    /// The Wipeout dxf definition includes three variables for brightness, contrast, and fade but those variables have no effect; in AutoCad you cannot even change them.<br/>
-    /// The Wipeout entity is related with the system variable WIPEOUTFRAME but this variable is not saved in a dxf.
+    /// The Wipeout DXF definition includes three variables for brightness, contrast, and fade but those variables have no effect; in AutoCad you cannot even change them.<br/>
+    /// The Wipeout entity is related with the system variable WIPEOUTFRAME but this variable is not saved in a DXF.
     /// </remarks>
     public class Wipeout :
         EntityObject
@@ -83,9 +86,7 @@ namespace netDxf.Entities
         public Wipeout(ClippingBoundary clippingBoundary)
             : base(EntityType.Wipeout, DxfObjectCode.Wipeout)
         {
-            if (clippingBoundary == null)
-                throw new ArgumentNullException("clippingBoundary");
-            this.clippingBoundary = clippingBoundary;
+            this.clippingBoundary = clippingBoundary ?? throw new ArgumentNullException(nameof(clippingBoundary));
             this.elevation = 0.0;
         }
 
@@ -101,9 +102,7 @@ namespace netDxf.Entities
             get { return this.clippingBoundary; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-                this.clippingBoundary = value;
+                this.clippingBoundary = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -120,6 +119,45 @@ namespace netDxf.Entities
         #endregion
 
         #region overrides
+
+        /// <summary>
+        /// Moves, scales, and/or rotates the current entity given a 3x3 transformation matrix and a translation vector.
+        /// </summary>
+        /// <param name="transformation">Transformation matrix.</param>
+        /// <param name="translation">Translation vector.</param>
+        /// <remarks>Matrix3 adopts the convention of using column vectors to represent a transformation matrix.</remarks>
+        public override void TransformBy(Matrix3 transformation, Vector3 translation)
+        {
+            double newElevation = this.Elevation;
+
+            Vector3 newNormal = transformation * this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
+
+            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
+
+            List<Vector2> vertexes = new List<Vector2>();
+
+            foreach (Vector2 vertex in this.ClippingBoundary.Vertexes)
+            {
+                Vector3 v = transOW * new Vector3(vertex.X, vertex.Y, this.Elevation);
+                v = transformation * v + translation;
+                v = transWO * v;
+                vertexes.Add(new Vector2(v.X, v.Y));
+                newElevation = v.Z;
+            }
+
+            ClippingBoundary newClipping = this.ClippingBoundary.Type == ClippingBoundaryType.Rectangular
+                ? new ClippingBoundary(vertexes[0], vertexes[1])
+                : new ClippingBoundary(vertexes);
+
+            this.Normal = newNormal;
+            this.Elevation = newElevation;
+            this.ClippingBoundary = newClipping;
+        }
 
         /// <summary>
         /// Creates a new Wipeout that is a copy of the current instance.
@@ -143,7 +181,9 @@ namespace netDxf.Entities
             };
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

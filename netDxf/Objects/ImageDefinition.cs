@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -37,16 +40,12 @@ namespace netDxf.Objects
     {
         #region private fields
 
-        private readonly string file;
-        private readonly int width;
-        private readonly int height;
+        private string file;
+        private int width;
+        private int height;
         private ImageResolutionUnits resolutionUnits;
-        // internally we will store the resolution in PPI
         private double horizontalResolution;
         private double verticalResolution;
-
-        // this will store the references to the images that makes use of this image definition (key: image handle, value: reactor)
-        private readonly Dictionary<string, ImageDefinitionReactor> reactors;
 
         #endregion
 
@@ -108,32 +107,49 @@ namespace netDxf.Objects
             : base(name, DxfObjectCode.ImageDef, false)
         {
             if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException("file");
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            if (file.IndexOfAny(Path.GetInvalidPathChars()) == 0)
+            {
+                throw new ArgumentException("File path contains invalid characters.", nameof(file));
+            }
+
             this.file = file;
 
             if (width <= 0)
-                throw new ArgumentOutOfRangeException("width", width, "The ImageDefinition width must be greater than zero.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(width), width, "The ImageDefinition width must be greater than zero.");
+            }
             this.width = width;
 
             if (height <= 0)
-                throw new ArgumentOutOfRangeException("height", height, "The ImageDefinition height must be greater than zero.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(height), height, "The ImageDefinition height must be greater than zero.");
+            }
             this.height = height;
 
             if (horizontalResolution <= 0)
-                throw new ArgumentOutOfRangeException("horizontalResolution", horizontalResolution, "The ImageDefinition horizontal resolution must be greater than zero.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(horizontalResolution), horizontalResolution, "The ImageDefinition horizontal resolution must be greater than zero.");
+            }
             this.horizontalResolution = horizontalResolution;
 
             if (verticalResolution <= 0)
-                throw new ArgumentOutOfRangeException("verticalResolution", verticalResolution, "The ImageDefinition vertical resolution must be greater than zero.");
+            {
+                throw new ArgumentOutOfRangeException(nameof(verticalResolution), verticalResolution, "The ImageDefinition vertical resolution must be greater than zero.");
+            }
             this.verticalResolution = verticalResolution;
 
             this.resolutionUnits = units;
 
-            this.reactors = new Dictionary<string, ImageDefinitionReactor>();
         }
 
+#if NET4X
+
         ///  <summary>
-        ///  Initializes a new instance of the <c>ImageDefinition</c> class.
+        ///  Initializes a new instance of the <c>ImageDefinition</c> class. Only available for Net Framework 4.5 builds.
         ///  </summary>
         ///  <param name="file">Image file name with full or relative path.</param>
         /// <remarks>
@@ -158,7 +174,7 @@ namespace netDxf.Objects
         }
 
         ///  <summary>
-        ///  Initializes a new instance of the <c>ImageDefinition</c> class.
+        ///  Initializes a new instance of the <c>ImageDefinition</c> class. Only available for Net Framework 4.5 builds.
         ///  </summary>
         /// <param name="name">Image definition name.</param>
         /// <param name="file">Image file name with full or relative path.</param>
@@ -182,17 +198,21 @@ namespace netDxf.Objects
             : base(name, DxfObjectCode.ImageDef, false)
         {
             if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException("file", "The image file name should be at least one character long.");
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
 
             FileInfo info = new FileInfo(file);
             if (!info.Exists)
-                throw new FileNotFoundException("Image file not found", file);
+            {
+                throw new FileNotFoundException("Image file not found.", file);
+            }
 
             this.file = file;
 
             try
-            {	/*
-                using (Image bitmap = Image.FromFile(file))
+            {
+                using (System.Drawing.Image bitmap = System.Drawing.Image.FromFile(file))
                 {
                     this.width = bitmap.Width;
                     this.height = bitmap.Height;
@@ -200,42 +220,112 @@ namespace netDxf.Objects
                     this.verticalResolution = bitmap.VerticalResolution;
                     // the System.Drawing.Image stores the image resolution in inches
                     this.resolutionUnits = ImageResolutionUnits.Inches;
-                }*/
+                }
             }
             catch (Exception)
             {
                 throw new ArgumentException("Image file not supported.", file);
             }
 
-            this.reactors = new Dictionary<string, ImageDefinitionReactor>();
         }
+
+#endif
 
         #endregion
 
         #region public properties
 
         /// <summary>
-        /// Gets the image file.
+        /// Gets or sets the image file.
         /// </summary>
+        /// <remarks>
+        /// When changing the image file the other properties should also be modified accordingly to avoid distortions in the final image.
+        /// </remarks>
         public string File
         {
             get { return this.file; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                if (value.IndexOfAny(Path.GetInvalidPathChars()) == 0)
+                {
+                    throw new ArgumentException("File path contains invalid characters.", nameof(value));
+                }
+
+                this.file = value;
+            }
         }
 
         /// <summary>
-        /// Gets the image width in pixels.
+        /// Gets or sets the image width in pixels.
         /// </summary>
         public int Width
         {
             get { return this.width; }
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ImageDefinition width must be greater than zero.");
+                }
+
+                this.width = value;
+            }
         }
 
         /// <summary>
-        /// Gets the image height in pixels.
+        /// Gets or sets the image height in pixels.
         /// </summary>
         public int Height
         {
             get { return this.height; }
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ImageDefinition height must be greater than zero.");
+                }
+
+                this.height = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the image horizontal resolution in pixels per unit.
+        /// </summary>
+        public double HorizontalResolution
+        {
+            get { return this.horizontalResolution; }
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ImageDefinition horizontal resolution must be greater than zero.");
+                }
+
+                this.horizontalResolution = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the image vertical resolution in pixels per unit.
+        /// </summary>
+        public double VerticalResolution
+        {
+            get { return this.verticalResolution; }
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The ImageDefinition vertical resolution must be greater than zero.");
+                }
+
+                this.verticalResolution = value;
+            }
         }
 
         /// <summary>
@@ -266,21 +356,6 @@ namespace netDxf.Objects
             }
         }
 
-        /// <summary>
-        /// Gets the image horizontal resolution in pixels per unit.
-        /// </summary>
-        public double HorizontalResolution
-        {
-            get { return this.horizontalResolution; }
-        }
-
-        /// <summary>
-        /// Gets the image vertical resolution in pixels per unit.
-        /// </summary>
-        public double VerticalResolution
-        {
-            get { return this.verticalResolution; }
-        }
 
         /// <summary>
         /// Gets the owner of the actual image definition.
@@ -293,16 +368,42 @@ namespace netDxf.Objects
 
         #endregion
 
-        #region internal properties
+        #region overrides
 
-        internal Dictionary<string, ImageDefinitionReactor> Reactors
+        /// <summary>
+        /// Checks if this instance has been referenced by other DxfObjects. 
+        /// </summary>
+        /// <returns>
+        /// Returns true if this instance has been referenced by other DxfObjects, false otherwise.
+        /// It will always return false if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same value as the HasReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public override bool HasReferences()
         {
-            get { return this.reactors; }
+            return this.Owner != null && this.Owner.HasReferences(this.Name);
         }
 
-        #endregion
+        /// <summary>
+        /// Gets the list of DxfObjects referenced by this instance.
+        /// </summary>
+        /// <returns>
+        /// A list of DxfObjectReference that contains the DxfObject referenced by this instance and the number of times it does.
+        /// It will return null if this instance does not belong to a document.
+        /// </returns>
+        /// <remarks>
+        /// This method returns the same list as the GetReferences method that can be found in the TableObjects class.
+        /// </remarks>
+        public override List<DxfObjectReference> GetReferences()
+        {
+            if (this.Owner == null)
+            {
+                return null;
+            }
 
-        #region overrides
+            return this.Owner.GetReferences(this.Name);
+        }
 
         /// <summary>
         /// Creates a new ImageDefinition that is a copy of the current instance.
@@ -314,7 +415,9 @@ namespace netDxf.Objects
             ImageDefinition copy = new ImageDefinition(newName, this.file, this.width, this.horizontalResolution, this.height, this.verticalResolution, this.resolutionUnits);
 
             foreach (XData data in this.XData.Values)
+            {
                 copy.XData.Add((XData)data.Clone());
+            }
 
             return copy;
         }

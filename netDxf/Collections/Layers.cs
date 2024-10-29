@@ -1,27 +1,31 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using netDxf.Tables;
 
 namespace netDxf.Collections
@@ -32,6 +36,12 @@ namespace netDxf.Collections
     public sealed class Layers :
         TableObjects<Layer>
     {
+        #region private fields
+
+        private readonly LayerStateManager stateManager;
+
+        #endregion
+
         #region constructor
 
         internal Layers(DxfDocument document)
@@ -42,7 +52,19 @@ namespace netDxf.Collections
         internal Layers(DxfDocument document, string handle)
             : base(document, DxfObjectCode.LayerTable, handle)
         {
-            this.MaxCapacity = short.MaxValue;
+            this.stateManager = new LayerStateManager(document);
+        }
+
+        #endregion
+
+        #region public properties
+
+        /// <summary>
+        /// Gets the layer state manager.
+        /// </summary>
+        public LayerStateManager StateManager
+        {
+            get { return this.stateManager; }
         }
 
         #endregion
@@ -60,20 +82,23 @@ namespace netDxf.Collections
         /// </returns>
         internal override Layer Add(Layer layer, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
             if (layer == null)
-                throw new ArgumentNullException("layer");
+            {
+                throw new ArgumentNullException(nameof(layer));
+            }
 
-            Layer add;
-            if (this.list.TryGetValue(layer.Name, out add))
+            if (this.List.TryGetValue(layer.Name, out Layer add))
+            {
                 return add;
+            }
 
             if (assignHandle || string.IsNullOrEmpty(layer.Handle))
-                this.Owner.NumHandles = layer.AsignHandle(this.Owner.NumHandles);
+            {
+                this.Owner.NumHandles = layer.AssignHandle(this.Owner.NumHandles);
+            }
 
-            this.list.Add(layer.Name, layer);
-            this.references.Add(layer.Name, new List<DxfObject>());
+            this.List.Add(layer.Name, layer);
+            this.References.Add(layer.Name, new DxfObjectReferences());
             layer.Linetype = this.Owner.Linetypes.Add(layer.Linetype);
             this.Owner.Linetypes.References[layer.Linetype.Name].Add(layer);
 
@@ -82,6 +107,7 @@ namespace netDxf.Collections
             layer.NameChanged += this.Item_NameChanged;
             layer.LinetypeChanged += this.LayerLinetypeChanged;
 
+            Debug.Assert(!string.IsNullOrEmpty(layer.Handle), "The layer handle cannot be null or empty.");
             this.Owner.AddedObjects.Add(layer.Handle, layer);
 
             return layer;
@@ -107,21 +133,29 @@ namespace netDxf.Collections
         public override bool Remove(Layer item)
         {
             if (item == null)
+            {
                 return false;
+            }
 
             if (!this.Contains(item))
+            {
                 return false;
+            }
 
             if (item.IsReserved)
+            {
                 return false;
+            }
 
-            if (this.references[item.Name].Count != 0)
+            if (this.HasReferences(item))
+            {
                 return false;
+            }
 
             this.Owner.Linetypes.References[item.Linetype.Name].Remove(item);
             this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            this.References.Remove(item.Name);
+            this.List.Remove(item.Name);
 
             item.Handle = null;
             item.Owner = null;
@@ -139,14 +173,17 @@ namespace netDxf.Collections
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
             if (this.Contains(e.NewValue))
+            {
                 throw new ArgumentException("There is already another layer with the same name.");
+            }
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (Layer) sender);
+            this.List.Remove(sender.Name);
+            this.List.Add(e.NewValue, (Layer) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObjectReference> refs = this.GetReferences(sender.Name);
+            this.References.Remove(sender.Name);
+            this.References.Add(e.NewValue, new DxfObjectReferences());
+            this.References[e.NewValue].Add(refs);
         }
 
         private void LayerLinetypeChanged(TableObject sender, TableObjectChangedEventArgs<Linetype> e)

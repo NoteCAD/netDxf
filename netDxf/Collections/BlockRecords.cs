@@ -1,27 +1,31 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using netDxf.Blocks;
 using netDxf.Entities;
 using netDxf.Tables;
@@ -44,7 +48,6 @@ namespace netDxf.Collections
         internal BlockRecords(DxfDocument document, string handle)
             : base(document, DxfObjectCode.BlockRecordTable, handle)
         {
-            this.MaxCapacity = short.MaxValue;
         }
 
         #endregion
@@ -62,32 +65,38 @@ namespace netDxf.Collections
         /// </returns>
         internal override Block Add(Block block, bool assignHandle)
         {
-            if (this.list.Count >= this.MaxCapacity)
-                throw new OverflowException(string.Format("Table overflow. The maximum number of elements the table {0} can have is {1}", this.CodeName, this.MaxCapacity));
-
             if (block == null)
-                throw new ArgumentNullException("block");
+            {
+                throw new ArgumentNullException(nameof(block));
+            }
 
-            Block add;
-            if (this.list.TryGetValue(block.Name, out add))
+            if (this.List.TryGetValue(block.Name, out Block add))
+            {
                 return add;
+            }
 
             if (assignHandle || string.IsNullOrEmpty(block.Handle))
-                this.Owner.NumHandles = block.AsignHandle(this.Owner.NumHandles);
+            {
+                this.Owner.NumHandles = block.AssignHandle(this.Owner.NumHandles);
+            }
 
-            this.list.Add(block.Name, block);
-            this.references.Add(block.Name, new List<DxfObject>());
+            this.List.Add(block.Name, block);
+            this.References.Add(block.Name, new DxfObjectReferences());
 
             block.Layer = this.Owner.Layers.Add(block.Layer);
             this.Owner.Layers.References[block.Layer.Name].Add(block);
 
             //for new block definitions configure its entities
             foreach (EntityObject entity in block.Entities)
-                this.Owner.AddEntityToDocument(entity, block, assignHandle);
+            {
+                this.Owner.AddEntityToDocument(entity, assignHandle);
+            }
 
             //for new block definitions configure its attributes
             foreach (AttributeDefinition attDef in block.AttributeDefinitions.Values)
+            {
                 this.Owner.AddAttributeDefinitionToDocument(attDef, assignHandle);
+            }
 
             block.Record.Owner = this;
 
@@ -98,6 +107,7 @@ namespace netDxf.Collections
             block.AttributeDefinitionAdded += this.Block_AttributeDefinitionAdded; 
             block.AttributeDefinitionRemoved += this.Block_AttributeDefinitionRemoved;
 
+            Debug.Assert(!string.IsNullOrEmpty(block.Handle), "The block handle cannot be null or empty.");
             this.Owner.AddedObjects.Add(block.Handle, block);
             this.Owner.AddedObjects.Add(block.Owner.Handle, block.Owner);
 
@@ -124,31 +134,43 @@ namespace netDxf.Collections
         public override bool Remove(Block item)
         {
             if (item == null)
+            {
                 return false;
+            }
 
             if (!this.Contains(item))
+            {
                 return false;
+            }
 
             if (item.IsReserved)
+            {
                 return false;
+            }
 
-            if (this.references[item.Name].Count != 0)
+            if (this.HasReferences(item))
+            {
                 return false;
+            }
 
             // remove the block from the associated layer
             this.Owner.Layers.References[item.Layer.Name].Remove(item);
 
             // we will remove all entities from the block definition
             foreach (EntityObject entity in item.Entities)
+            {
                 this.Owner.RemoveEntityFromDocument(entity);
+            }
 
             // remove all attribute definitions from the associated layers
             foreach (AttributeDefinition attDef in item.AttributeDefinitions.Values)
+            {
                 this.Owner.RemoveAttributeDefinitionFromDocument(attDef);
+            }
 
             this.Owner.AddedObjects.Remove(item.Handle);
-            this.references.Remove(item.Name);
-            this.list.Remove(item.Name);
+            this.References.Remove(item.Name);
+            this.List.Remove(item.Name);
 
             item.Record.Handle = null;
             item.Record.Owner = null;
@@ -173,14 +195,17 @@ namespace netDxf.Collections
         private void Item_NameChanged(TableObject sender, TableObjectChangedEventArgs<string> e)
         {
             if (this.Contains(e.NewValue))
+            {
                 throw new ArgumentException("There is already another block with the same name.");
+            }
 
-            this.list.Remove(sender.Name);
-            this.list.Add(e.NewValue, (Block) sender);
+            this.List.Remove(sender.Name);
+            this.List.Add(e.NewValue, (Block) sender);
 
-            List<DxfObject> refs = this.references[sender.Name];
-            this.references.Remove(sender.Name);
-            this.references.Add(e.NewValue, refs);
+            List<DxfObjectReference> refs = this.GetReferences(sender.Name);
+            this.References.Remove(sender.Name);
+            this.References.Add(e.NewValue, new DxfObjectReferences());
+            this.References[e.NewValue].Add(refs);
         }
 
         private void Block_LayerChanged(Block sender, TableObjectChangedEventArgs<Layer> e)
@@ -193,20 +218,7 @@ namespace netDxf.Collections
 
         private void Block_EntityAdded(TableObject sender, BlockEntityChangeEventArgs e)
         {
-            if (e.Item.Owner != null)
-            {
-                // the block and its entities must belong to the same document
-                if (!ReferenceEquals(e.Item.Owner.Record.Owner.Owner, this.Owner))
-                    throw new ArgumentException("The block and the entity must belong to the same document. Clone it instead.");
-
-                // the entity cannot belong to another block
-                if (e.Item.Owner.Record.Layout == null)
-                    throw new ArgumentException("The entity cannot belong to another block. Clone it instead.");
-
-                // we will exchange the owner of the entity
-                this.Owner.RemoveEntity(e.Item);
-            }
-            this.Owner.AddEntityToDocument(e.Item, (Block) sender, string.IsNullOrEmpty(e.Item.Handle));
+            this.Owner.AddEntityToDocument(e.Item, string.IsNullOrEmpty(e.Item.Handle));
         }
 
         private void Block_EntityRemoved(TableObject sender, BlockEntityChangeEventArgs e)
@@ -216,19 +228,6 @@ namespace netDxf.Collections
 
         private void Block_AttributeDefinitionAdded(Block sender, BlockAttributeDefinitionChangeEventArgs e)
         {
-            if (e.Item.Owner != null)
-            {
-                // the block and its entities must belong to the same document
-                if (!ReferenceEquals(e.Item.Owner.Record.Owner.Owner, this.Owner))
-                    throw new ArgumentException("The block and the entity must belong to the same document. Clone it instead.");
-
-                // the entity cannot belong to another block
-                if (e.Item.Owner.Record.Layout == null)
-                    throw new ArgumentException("The entity cannot belong to another block. Clone it instead.");
-
-                // we will exchange the owner of the entity
-                this.Owner.RemoveAttributeDefinitionFromDocument(e.Item);
-            }
             this.Owner.AddAttributeDefinitionToDocument(e.Item, string.IsNullOrEmpty(e.Item.Handle));
         }
 

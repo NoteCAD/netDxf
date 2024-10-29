@@ -1,26 +1,30 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
+using System.Diagnostics;
 using netDxf.Blocks;
 using netDxf.Tables;
 
@@ -71,15 +75,13 @@ namespace netDxf.Entities
             : base(DimensionType.Diameter)
         {
             if (arc == null)
-                throw new ArgumentNullException("arc");
+                throw new ArgumentNullException(nameof(arc));
 
             Vector3 ocsCenter = MathHelper.Transform(arc.Center, arc.Normal, CoordinateSystem.World, CoordinateSystem.Object);
             this.center = new Vector2(ocsCenter.X, ocsCenter.Y);
             this.refPoint = Vector2.Polar(this.center, arc.Radius, rotation*MathHelper.DegToRad);
 
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
             this.Normal = arc.Normal;
             this.Elevation = ocsCenter.Z;
             this.Update();
@@ -107,15 +109,13 @@ namespace netDxf.Entities
             : base(DimensionType.Diameter)
         {
             if (circle == null)
-                throw new ArgumentNullException("circle");
+                throw new ArgumentNullException(nameof(circle));
 
             Vector3 ocsCenter = MathHelper.Transform(circle.Center, circle.Normal, CoordinateSystem.World, CoordinateSystem.Object);
             this.center = new Vector2(ocsCenter.X, ocsCenter.Y);
             this.refPoint = Vector2.Polar(this.center, circle.Radius, rotation*MathHelper.DegToRad);
 
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
             this.Normal = circle.Normal;
             this.Elevation = ocsCenter.Z;
             this.Update();
@@ -142,12 +142,13 @@ namespace netDxf.Entities
         public DiametricDimension(Vector2 centerPoint, Vector2 referencePoint, DimensionStyle style)
             : base(DimensionType.Diameter)
         {
+            if(Vector2.Equals(centerPoint, referencePoint))
+                throw new ArgumentException("The center and the reference point cannot be the same");
             this.center = centerPoint;
             this.refPoint = referencePoint;
 
-            if (style == null)
-                throw new ArgumentNullException("style");
-            this.Style = style;
+            this.Style = style ?? throw new ArgumentNullException(nameof(style));
+
             this.Update();
         }
 
@@ -197,24 +198,23 @@ namespace netDxf.Entities
             this.defPoint = Vector2.Polar(this.center, -radius, rotation);
             this.refPoint = Vector2.Polar(this.center, radius, rotation);
 
-
             if (!this.TextPositionManuallySet)
             {
                 DimensionStyleOverride styleOverride;
                 double textGap = this.Style.TextOffset;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
                 {
-                    textGap = (double)styleOverride.Value;
+                    textGap = (double) styleOverride.Value;
                 }
                 double scale = this.Style.DimScaleOverall;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
                 {
-                    scale = (double)styleOverride.Value;
+                    scale = (double) styleOverride.Value;
                 }
                 double arrowSize = this.Style.ArrowSize;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.ArrowSize, out styleOverride))
                 {
-                    arrowSize = (double)styleOverride.Value;
+                    arrowSize = (double) styleOverride.Value;
                 }
 
                 Vector2 vec = Vector2.Normalize(this.refPoint - this.center);
@@ -228,10 +228,68 @@ namespace netDxf.Entities
         #region overrides
 
         /// <summary>
+        /// Moves, scales, and/or rotates the current entity given a 3x3 transformation matrix and a translation vector.
+        /// </summary>
+        /// <param name="transformation">Transformation matrix.</param>
+        /// <param name="translation">Translation vector.</param>
+        /// <remarks>
+        /// Non-uniform and zero scaling local to the dimension entity are not supported.<br />
+        /// The transformation will not be applied if the resulting center and reference points are the same.<br />
+        /// Matrix3 adopts the convention of using column vectors to represent a transformation matrix.
+        /// </remarks>
+        public override void TransformBy(Matrix3 transformation, Vector3 translation)
+        {
+            Vector3 newNormal = transformation * this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
+
+            Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
+            Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
+
+            Vector3 v = transOW * new Vector3(this.CenterPoint.X, this.CenterPoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newCenter = new Vector2(v.X, v.Y);
+            double newElevation = v.Z;
+
+            v = transOW * new Vector3(this.ReferencePoint.X, this.ReferencePoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            Vector2 newRefPoint = new Vector2(v.X, v.Y);
+
+            if(Vector2.Equals(newCenter, newRefPoint))
+            {
+                Debug.Assert(false, "The transformation cannot be applied, the resulting center and reference points are the same.");
+                return;
+            }
+
+            v = transOW * new Vector3(this.textRefPoint.X, this.textRefPoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            this.textRefPoint = new Vector2(v.X, v.Y);
+
+            v = transOW * new Vector3(this.defPoint.X, this.defPoint.Y, this.Elevation);
+            v = transformation * v + translation;
+            v = transWO * v;
+            this.defPoint = new Vector2(v.X, v.Y);
+
+            this.CenterPoint = newCenter;
+            this.ReferencePoint = newRefPoint;
+            this.Elevation = newElevation;
+            this.Normal = newNormal;
+        }
+
+        /// <summary>
         /// Calculate the dimension reference points.
         /// </summary>
-        protected override void CalculteReferencePoints()
+        protected override void CalculateReferencePoints()
         {
+            if (Vector2.Equals(this.center, this.refPoint))
+            {
+                throw new ArgumentException("The center and the reference point cannot be the same");
+            }
 
             double measure = this.Measurement;
             Vector2 centerRef = this.center;
@@ -252,17 +310,17 @@ namespace netDxf.Entities
                 double textGap = this.Style.TextOffset;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.TextOffset, out styleOverride))
                 {
-                    textGap = (double)styleOverride.Value;
+                    textGap = (double) styleOverride.Value;
                 }
                 double scale = this.Style.DimScaleOverall;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.DimScaleOverall, out styleOverride))
                 {
-                    scale = (double)styleOverride.Value;
+                    scale = (double) styleOverride.Value;
                 }
                 double arrowSize = this.Style.ArrowSize;
                 if (this.StyleOverrides.TryGetValue(DimensionStyleOverrideType.ArrowSize, out styleOverride))
                 {
-                    arrowSize = (double)styleOverride.Value;
+                    arrowSize = (double) styleOverride.Value;
                 }
 
                 Vector2 vec = Vector2.Normalize(this.refPoint - this.center);
@@ -316,15 +374,14 @@ namespace netDxf.Entities
 
             foreach (DimensionStyleOverride styleOverride in this.StyleOverrides.Values)
             {
-                object copy;
-                ICloneable value = styleOverride.Value as ICloneable;
-                copy = value != null ? value.Clone() : styleOverride.Value;
-
+                object copy = styleOverride.Value is ICloneable value ? value.Clone() : styleOverride.Value;
                 entity.StyleOverrides.Add(new DimensionStyleOverride(styleOverride.Type, copy));
             }
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

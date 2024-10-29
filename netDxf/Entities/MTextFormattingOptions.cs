@@ -1,86 +1,63 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
-using netDxf.Tables;
 
 namespace netDxf.Entities
 {
     /// <summary>
     /// Options for the <see cref="MText">multiline text</see> entity text formatting.
     /// </summary>
+    /// <remarks>Old DXF versions might not support all available formatting codes.</remarks>
     public class MTextFormattingOptions
     {
-        /// <summary>
-        /// Text alignment options.
-        /// </summary>
-        public enum TextAligment
-        {
-            /// <summary>
-            /// Bottom.
-            /// </summary>
-            Bottom = 0,
-
-            /// <summary>
-            /// Center.
-            /// </summary>
-            Center = 1,
-
-            /// <summary>
-            /// Top.
-            /// </summary>
-            Top = 2,
-
-            /// <summary>
-            /// Current value (no changes).
-            /// </summary>
-            Default = 3
-        }
-
         #region private fields
 
+        private double superSubScriptHeightFactor;
         private bool bold;
         private bool italic;
         private bool overline;
         private bool underline;
         private bool strikeThrough;
+        private bool superscript;
+        private bool subscript;
         private AciColor color;
         private string fontName;
-        private TextAligment aligment;
         private double heightFactor;
         private double obliqueAngle;
         private double characterSpaceFactor;
         private double widthFactor;
-        private readonly TextStyle style;
 
         #endregion
 
         #region constructors
 
         /// <summary>
-        /// Initializes a new instance of the <c>MTextFormattingOptions</c> class
+        /// Initializes a new instance of the <c>MTextFormattingOptions</c> class.
         /// </summary>
-        /// <param name="style">Current style of the <see cref="MText">multiline text</see> entity.</param>
-        public MTextFormattingOptions(TextStyle style)
+        public MTextFormattingOptions()
         {
             this.bold = false;
             this.italic = false;
@@ -88,12 +65,11 @@ namespace netDxf.Entities
             this.underline = false;
             this.color = null;
             this.fontName = null;
-            this.aligment = TextAligment.Default;
             this.heightFactor = 1.0;
             this.obliqueAngle = 0.0;
             this.characterSpaceFactor = 1.0;
             this.widthFactor = 1.0;
-            this.style = style;
+            this.superSubScriptHeightFactor = 0.7;
         }
 
         #endregion
@@ -103,7 +79,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets or sets if the text is bold.
         /// </summary>
-        /// <remarks>The style font must support bold characters.</remarks>
+        /// <remarks>The font style must support bold characters.</remarks>
         public bool Bold
         {
             get { return this.bold; }
@@ -113,7 +89,7 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets or sets if the text is italic.
         /// </summary>
-        /// <remarks>The style font must support italic characters.</remarks>
+        /// <remarks>The font style must support italic characters.</remarks>
         public bool Italic
         {
             get { return this.italic; }
@@ -121,7 +97,7 @@ namespace netDxf.Entities
         }
 
         /// <summary>
-        /// Gets or sets the overline.
+        /// Gets or sets the over line.
         /// </summary>
         public bool Overline
         {
@@ -148,11 +124,61 @@ namespace netDxf.Entities
         }
 
         /// <summary>
+        /// Get or set if the text is superscript.
+        /// </summary>
+        /// <remarks>
+        /// The Superscript and subscript properties are mutually exclusive, if it is set to true the Subscript property will be set to false automatically.<br />
+        /// Internally, superscripts and subscripts are written as stacking text (like fractions);
+        /// therefore the characters '/' and '#' are reserved if you need to write them you must write '\/' and '\#' respectively.
+        /// </remarks>
+        public bool Superscript
+        {
+            get { return this.superscript; }
+            set
+            {
+                if (value) this.subscript = false;
+                this.superscript = value;
+            }
+        }
+
+        /// <summary>
+        /// Get or set if the text is subscript.
+        /// </summary>
+        /// <remarks>
+        /// The Superscript and Subscript properties are mutually exclusive, if it is set to true the Superscript property will be set to false automatically.<br />
+        /// Internally, superscripts and subscripts are written as stacking text (like fractions);
+        /// therefore the characters '/' and '#' are reserved if you need to write them you must write '\/' and '\#' respectively.
+        /// </remarks>
+        public bool Subscript
+        {
+            get { return this.subscript; }
+            set
+            {
+                if (value) this.superscript = false;
+                this.subscript = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the superscript and subscript text height as a multiple of the current text height.
+        /// </summary>
+        /// <remarks>By default it is set as 0.7 the current text height.</remarks>
+        public double SuperSubScriptHeightFactor
+        {
+            get { return this.superSubScriptHeightFactor; }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The character percentage height must be greater than zero.");
+                this.superSubScriptHeightFactor = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the text color.
         /// </summary>
         /// <remarks>
-        /// Set as null to apply the default color.<br />
-        /// True color is only compatible with dxf database version greater than AutoCad2000.
+        /// Set as null to apply the default color defined by the MText entity.
         /// </remarks>
         public AciColor Color
         {
@@ -161,22 +187,17 @@ namespace netDxf.Entities
         }
 
         /// <summary>
-        /// Gets or sets the font file name (.ttf fonts without the extension).
+        /// Gets or sets the font that will override the default defined in the TextStyle. 
         /// </summary>
-        /// <remarks>Set as null to apply the default font.</remarks>
+        /// <remarks>
+        /// Set as null or empty to apply the default font.<br />
+        /// When using SHX fonts use the font file with the SHX extension,
+        /// when using TTF fonts use the font family name.
+        /// </remarks>
         public string FontName
         {
             get { return this.fontName; }
             set { this.fontName = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the text alignment.
-        /// </summary>
-        public TextAligment Aligment
-        {
-            get { return this.aligment; }
-            set { this.aligment = value; }
         }
 
         /// <summary>
@@ -189,7 +210,7 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException("value", value, "The character percentage height must be greater than zero.");
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The character percentage height must be greater than zero.");
                 this.heightFactor = value;
             }
         }
@@ -204,7 +225,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < -85.0 || value > 85.0)
-                    throw new ArgumentOutOfRangeException("value", value, "The oblique angle valid values range from -85 to 85.");
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The oblique angle valid values range from -85 to 85.");
                 this.obliqueAngle = value;
             }
         }
@@ -222,7 +243,7 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0.75 || value > 4)
-                    throw new ArgumentOutOfRangeException("value", value, "The character space valid values range from a minimum of .75 to 4");
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The character space valid values range from a minimum of .75 to 4");
                 this.characterSpaceFactor = value;
             }
         }
@@ -237,66 +258,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException("value", value, "The width factor should be greater than zero.");
+                    throw new ArgumentOutOfRangeException(nameof(value), value, "The width factor should be greater than zero.");
                 this.widthFactor = value;
             }
-        }
-
-        #endregion
-
-        #region public methods
-
-        /// <summary>
-        /// Obtains the string that represents the formatted text applying the current options.
-        /// </summary>
-        /// <param name="text">Text to be formatted.</param>
-        /// <returns>The formatted text string.</returns>
-        public string FormatText(string text)
-        {
-            string formattedText = text;
-            if (this.overline)
-                formattedText = string.Format("\\O{0}\\o", formattedText);
-            if (this.underline)
-                formattedText = string.Format("\\L{0}\\l", formattedText);
-            if (this.strikeThrough)
-                formattedText = string.Format("\\K{0}\\k", formattedText);
-            if (this.color != null)
-            {
-                formattedText = this.color.UseTrueColor ?
-                    string.Format("\\C{0};\\c{1};{2}", this.color.Index, AciColor.ToTrueColor(this.color), formattedText) :
-                    string.Format("\\C{0};{1}", this.color.Index, formattedText);
-            }
-            if (this.fontName != null)
-            {
-                if (this.bold && this.italic)
-                    formattedText = string.Format("\\f{0}|b1|i1;{1}", this.fontName, formattedText);
-                else if (this.bold && !this.italic)
-                    formattedText = string.Format("\\f{0}|b1|i0;{1}", this.fontName, formattedText);
-                else if (!this.bold && this.italic)
-                    formattedText = string.Format("\\f{0}|i1|b0;{1}", this.fontName, formattedText);
-                else
-                    formattedText = string.Format("\\F{0};{1}", this.fontName, formattedText);
-            }
-            else
-            {
-                if (this.bold && this.italic)
-                    formattedText = string.Format("\\f{0}|b1|i1;{1}", this.style.FontFamilyName, formattedText);
-                if (this.bold && !this.italic)
-                    formattedText = string.Format("\\f{0}|b1|i0;{1}", this.style.FontFamilyName, formattedText);
-                if (!this.bold && this.italic)
-                    formattedText = string.Format("\\f{0}|i1|b0;{1}", this.style.FontFamilyName, formattedText);
-            }
-            if (this.aligment != TextAligment.Default)
-                formattedText = string.Format("\\A{0};{1}", (int) this.aligment, formattedText);
-            if (!MathHelper.IsOne(this.heightFactor))
-                formattedText = string.Format("\\H{0}x;{1}", this.heightFactor, formattedText);
-            if (!MathHelper.IsZero(this.obliqueAngle))
-                formattedText = string.Format("\\Q{0};{1}", this.obliqueAngle, formattedText);
-            if (!MathHelper.IsOne(this.characterSpaceFactor))
-                formattedText = string.Format("\\T{0};{1}", this.characterSpaceFactor, formattedText);
-            if (!MathHelper.IsOne(this.widthFactor))
-                formattedText = string.Format("\\W{0};{1}", this.widthFactor, formattedText);
-            return "{" + formattedText + "}";
         }
 
         #endregion

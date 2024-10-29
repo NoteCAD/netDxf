@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System.Collections.Generic;
@@ -31,7 +34,7 @@ namespace netDxf.Entities
     {
         #region private fields
 
-        private Vector2 location;
+        private Vector2 position;
         private readonly Vector2 direction;
         private readonly Vector2 miter;
         private readonly List<double>[] distances;
@@ -42,7 +45,7 @@ namespace netDxf.Entities
 
         internal MLineVertex(Vector2 location, Vector2 direction, Vector2 miter, List<double>[] distances)
         {
-            this.location = location;
+            this.position = location;
             this.direction = direction;
             this.miter = miter;
             this.distances = distances;
@@ -56,12 +59,12 @@ namespace netDxf.Entities
         /// Gets the MLine vertex position.
         /// </summary>
         /// <remarks>
-        /// If this property is modified the function MLine.CalculateVertexesInfo() will need to be called manually to update the internal information.
+        /// If this property is modified the function MLine.Update() will need to be called manually to update the internal information.
         /// </remarks>
-        public Vector2 Location
+        public Vector2 Position
         {
-            get { return this.location; }
-            set { this.location = value; }
+            get { return this.position; }
+            set { this.position = value; }
         }
 
         /// <summary>
@@ -86,7 +89,7 @@ namespace netDxf.Entities
         /// <remarks>
         /// <para>
         /// There is a list for every MLineStyle element, and every list contains an array of real values
-        /// that parameterize the start and end point of every element of the style.
+        /// that parametrize the start and end point of every element of the style.
         /// </para>
         /// <para>
         /// The first value (index 0) represents the distance from the segment vertex along the miter vector to the
@@ -111,7 +114,7 @@ namespace netDxf.Entities
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: ({1})", "MLineVertex", this.location);
+            return string.Format("{0}: ({1})", "MLineVertex", this.position);
         }
 
         /// <summary>
@@ -126,7 +129,7 @@ namespace netDxf.Entities
                 copyDistances[i] = new List<double>();
                 copyDistances[i].AddRange(this.distances[i]);
             }
-            return new MLineVertex(this.location, this.direction, this.miter, copyDistances);
+            return new MLineVertex(this.position, this.direction, this.miter, copyDistances);
         }
 
         #endregion

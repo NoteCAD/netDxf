@@ -1,38 +1,40 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using netDxf.Entities;
 using Attribute = netDxf.Entities.Attribute;
 
 namespace netDxf.Collections
 {
     /// <summary>
-    /// Represents a collection of <see cref="Entities.Attribute">Attributes</see>.
+    /// Represents a collection of <see cref="Attribute">Attributes</see>.
     /// </summary>
     public sealed class AttributeCollection :
-        IList<Attribute>
+        IReadOnlyList<Attribute>
     {
         #region private fields
 
@@ -57,7 +59,9 @@ namespace netDxf.Collections
         public AttributeCollection(IEnumerable<Attribute> attributes)
         {
             if (attributes == null)
-                throw new ArgumentNullException("attributes");
+            {
+                throw new ArgumentNullException(nameof(attributes));
+            }
             this.innerArray = new List<Attribute>(attributes);
         }
 
@@ -73,28 +77,20 @@ namespace netDxf.Collections
             get { return this.innerArray.Count; }
         }
 
-		public bool IsReadOnly {
-			get {
-				throw new NotImplementedException();
-			}
-		}
+        /// <summary>
+        /// Gets a value indicating whether the collection is read-only.
+        /// </summary>
+        public static bool IsReadOnly
+        {
+            get { return true; }
+        }
 
-		Attribute IList<Attribute>.this[int index] {
-			get {
-				throw new NotImplementedException();
-			}
-
-			set {
-				throw new NotImplementedException();
-			}
-		}
-
-		/// <summary>
-		/// Gets the attribute at the specified index.
-		/// </summary>
-		/// <param name="index"> The zero-based index of the element to get or set.</param>
-		/// <returns>The object at the specified index.</returns>
-		public Attribute this[int index]
+        /// <summary>
+        /// Gets the attribute at the specified index.
+        /// </summary>
+        /// <param name="index"> The zero-based index of the element to get or set.</param>
+        /// <returns>The object at the specified index.</returns>
+        public Attribute this[int index]
         {
             get { return this.innerArray[index]; }
         }
@@ -141,12 +137,18 @@ namespace netDxf.Collections
         public Attribute AttributeWithTag(string tag)
         {
             if (string.IsNullOrEmpty(tag))
+            {
                 return null;
+            }
             foreach (Attribute att in this.innerArray)
             {
                 if (att.Definition != null)
+                {
                     if (string.Equals(tag, att.Tag, StringComparison.OrdinalIgnoreCase))
+                    {
                         return att;
+                    }
+                }
             }
 
             return null;
@@ -170,26 +172,6 @@ namespace netDxf.Collections
             return this.GetEnumerator();
         }
 
-		public void Insert(int index, Attribute item) {
-			throw new NotImplementedException();
-		}
-
-		public void RemoveAt(int index) {
-			throw new NotImplementedException();
-		}
-
-		public void Add(Attribute item) {
-			throw new NotImplementedException();
-		}
-
-		public void Clear() {
-			throw new NotImplementedException();
-		}
-
-		public bool Remove(Attribute item) {
-			throw new NotImplementedException();
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }
