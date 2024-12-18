@@ -498,11 +498,11 @@ namespace netDxf
         /// </summary>
         /// <param name="color">A <see cref="Color">color</see>.</param>
         /// <remarks>By default the UseTrueColor will be set to true.</remarks>
-        public AciColor(Color color)
+        /*public AciColor(Color color)
             : this(color.R, color.G, color.B)
         {
         }
-
+        */
         /// <summary>
         /// Initializes a new instance of the <c>AciColor</c> class.
         /// </summary>
@@ -827,20 +827,20 @@ namespace netDxf
         /// <remarks>
         /// A default color white will be used for ByLayer and ByBlock colors.
         /// </remarks>
-        public Color ToColor()
+        /*public Color ToColor()
         {
             if (this.index < 1 || this.index > 255) //default color definition for ByLayer and ByBlock colors
             {
                 return Color.White;
             }
             return Color.FromArgb(this.r, this.g, this.b);
-        }
+        }*/
 
         /// <summary>
         /// Converts a <see cref="Color">color</see> to an <see cref="Color">AciColor</see>.
         /// </summary>
         /// <param name="color">A <see cref="Color">color</see>.</param>
-        public void FromColor(Color color)
+        /*public void FromColor(Color color)
         {
             this.r = color.R;
             this.g = color.G;
@@ -848,7 +848,7 @@ namespace netDxf
             this.useTrueColor = true;
             this.index = RgbToAci(this.r, this.g, this.b);
         }
-
+        */
         /// <summary>
         /// Gets the <see cref="AciColor">color</see> from an index.
         /// </summary>
